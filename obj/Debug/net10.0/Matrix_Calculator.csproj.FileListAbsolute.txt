@@ -1,0 +1,15 @@
+C:\Users\tahaa\Documents\Obsidian Vault\University\2026\COS20007\Custom project\Matrix-Calculator-Custom-Project\bin\Debug\net10.0\Matrix_Calculator.exe
+C:\Users\tahaa\Documents\Obsidian Vault\University\2026\COS20007\Custom project\Matrix-Calculator-Custom-Project\bin\Debug\net10.0\Matrix_Calculator.deps.json
+C:\Users\tahaa\Documents\Obsidian Vault\University\2026\COS20007\Custom project\Matrix-Calculator-Custom-Project\bin\Debug\net10.0\Matrix_Calculator.runtimeconfig.json
+C:\Users\tahaa\Documents\Obsidian Vault\University\2026\COS20007\Custom project\Matrix-Calculator-Custom-Project\bin\Debug\net10.0\Matrix_Calculator.dll
+C:\Users\tahaa\Documents\Obsidian Vault\University\2026\COS20007\Custom project\Matrix-Calculator-Custom-Project\bin\Debug\net10.0\Matrix_Calculator.pdb
+C:\Users\tahaa\Documents\Obsidian Vault\University\2026\COS20007\Custom project\Matrix-Calculator-Custom-Project\obj\Debug\net10.0\Matrix_Calculator.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\tahaa\Documents\Obsidian Vault\University\2026\COS20007\Custom project\Matrix-Calculator-Custom-Project\obj\Debug\net10.0\Matrix_Calculator.AssemblyInfoInputs.cache
+C:\Users\tahaa\Documents\Obsidian Vault\University\2026\COS20007\Custom project\Matrix-Calculator-Custom-Project\obj\Debug\net10.0\Matrix_Calculator.AssemblyInfo.cs
+C:\Users\tahaa\Documents\Obsidian Vault\University\2026\COS20007\Custom project\Matrix-Calculator-Custom-Project\obj\Debug\net10.0\Matrix_Calculator.csproj.CoreCompileInputs.cache
+C:\Users\tahaa\Documents\Obsidian Vault\University\2026\COS20007\Custom project\Matrix-Calculator-Custom-Project\obj\Debug\net10.0\Matrix_Calculator.sourcelink.json
+C:\Users\tahaa\Documents\Obsidian Vault\University\2026\COS20007\Custom project\Matrix-Calculator-Custom-Project\obj\Debug\net10.0\Matrix_Calculator.dll
+C:\Users\tahaa\Documents\Obsidian Vault\University\2026\COS20007\Custom project\Matrix-Calculator-Custom-Project\obj\Debug\net10.0\refint\Matrix_Calculator.dll
+C:\Users\tahaa\Documents\Obsidian Vault\University\2026\COS20007\Custom project\Matrix-Calculator-Custom-Project\obj\Debug\net10.0\Matrix_Calculator.pdb
+C:\Users\tahaa\Documents\Obsidian Vault\University\2026\COS20007\Custom project\Matrix-Calculator-Custom-Project\obj\Debug\net10.0\Matrix_Calculator.genruntimeconfig.cache
+C:\Users\tahaa\Documents\Obsidian Vault\University\2026\COS20007\Custom project\Matrix-Calculator-Custom-Project\obj\Debug\net10.0\ref\Matrix_Calculator.dll

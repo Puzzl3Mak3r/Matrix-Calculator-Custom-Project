@@ -7,7 +7,8 @@ namespace Matrix_Calculator
     {
         public static void Main()
         {
-
+            CalculatorGUI gui = new CalculatorGUI();
+            gui.Run();
         }
     }
 }

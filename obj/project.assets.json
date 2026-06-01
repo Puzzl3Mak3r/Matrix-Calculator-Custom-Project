@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\tahaa\\Documents\\Obsidian Vault\\University\\2026\\COS20007\\Custom project\\Matrix Calculator\\Matrix_Calculator.csproj",
+      "projectUniqueName": "C:\\Users\\tahaa\\Documents\\Obsidian Vault\\University\\2026\\COS20007\\Custom project\\Matrix-Calculator-Custom-Project\\Matrix_Calculator.csproj",
       "projectName": "Matrix_Calculator",
-      "projectPath": "C:\\Users\\tahaa\\Documents\\Obsidian Vault\\University\\2026\\COS20007\\Custom project\\Matrix Calculator\\Matrix_Calculator.csproj",
+      "projectPath": "C:\\Users\\tahaa\\Documents\\Obsidian Vault\\University\\2026\\COS20007\\Custom project\\Matrix-Calculator-Custom-Project\\Matrix_Calculator.csproj",
       "packagesPath": "C:\\Users\\tahaa\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\tahaa\\Documents\\Obsidian Vault\\University\\2026\\COS20007\\Custom project\\Matrix Calculator\\obj\\",
+      "outputPath": "C:\\Users\\tahaa\\Documents\\Obsidian Vault\\University\\2026\\COS20007\\Custom project\\Matrix-Calculator-Custom-Project\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\tahaa\\AppData\\Roaming\\NuGet\\NuGet.Config",
