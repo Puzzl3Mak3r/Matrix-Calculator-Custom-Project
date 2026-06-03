@@ -1,111 +1,157 @@
 using System;
 using SplashKitSDK;
 
-namespace Matrix_Calculator
-{
-    
-    // The orchestrator module running the SplashKit window event loop.
-    // Intercepts mouse coordinates to identify active matrix cells and routes operational requests to strategies.
-    
-    public class CalculatorGUI
-    {
-        private Matrix _matrixA;
-        private Matrix _matrixB;
-        private Matrix _matrixResult;
-        private IMathOperation _activeStrategy;
-        private MatrixMemento _internalClipboard;
+namespace Matrix_Calculator {
+    // Store Variables
+    // 
+
+    public class CalculatorGUI {
+        // Variables for GUI
         private Window _window;
+        private Rectangle _addButton;
+        private Rectangle _subtractButton;
+        private Rectangle _multiplyButton;
+        private Rectangle _transposeButton;
+        private Rectangle _inverseButton;
+        // Var for entering data into matrix
+        private Rectangle _matrixEntryBox;
+
+        // Variables for Matrices
+        public double[][] matrices = {}; // Can store any number of matrices, look at MatrixStorageIdea.md for more details
 
         public CalculatorGUI()
         {
-            // Initializing with some default matrices
-            _matrixA = MatrixFactory.CreateIdentityMatrix(2);
-            _matrixB = MatrixFactory.CreateIdentityMatrix(2);
-            _matrixResult = MatrixFactory.CreateZeroMatrix(2, 2);
-            _activeStrategy = new MatrixAddition();
-            
+            // Initialize the window and buttons
             _window = new Window("Matrix Calculator", 800, 600);
+            _addButton        = SplashKit.RectangleFrom(50, 50, 100, 50);
+            _subtractButton   = SplashKit.RectangleFrom(200, 50, 100, 50);
+            _multiplyButton   = SplashKit.RectangleFrom(350, 50, 100, 50);
+            _transposeButton  = SplashKit.RectangleFrom(500, 50, 100, 50);
+            _inverseButton    = SplashKit.RectangleFrom(650, 50, 100, 50);
+            _matrixEntryBox   = SplashKit.RectangleFrom(50, 150, 700, 400);
         }
 
-        
-        // Starts the main application loop.
-        
         public void Run()
         {
+            // Clear screen to prevent ghosting
+            SplashKit.ClearScreen(Color.White);
+            DrawUI();
+
+            // Main event loop
             while (!_window.CloseRequested)
             {
                 SplashKit.ProcessEvents();
-                Update();
-                Draw();
-            }
-        }
 
-        private void Update()
-        {
-            // Key-based strategy selection
-            if (SplashKit.KeyTyped(KeyCode.AKey))
-            {
-                _activeStrategy = new MatrixAddition();
-                PerformCalculation();
-            }
-            else if (SplashKit.KeyTyped(KeyCode.SKey))
-            {
-                _activeStrategy = new MatrixSubtraction();
-                PerformCalculation();
-            }
-            else if (SplashKit.KeyTyped(KeyCode.MKey))
-            {
-                _activeStrategy = new MatrixMultiplication();
-                PerformCalculation();
-            }
-            
-            // Example trigger for LaTeX export
-            if (SplashKit.KeyTyped(KeyCode.CKey))
-            {
-                ClipboardService.CopyText(_matrixResult.ToLatexString());
-            }
-        }
 
-        private void PerformCalculation()
-        {
-            try
-            {
-                _matrixResult = _activeStrategy.Execute(_matrixA, _matrixB);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Calculation Error: " + ex.Message);
-            }
-        }
-
-        private void Draw()
-        {
-            _window.Clear(Color.White);
-
-            // A basic layout of matrices and instructions
-            SplashKit.DrawText("Matrix Calculator", Color.Black, 10, 10);
-            SplashKit.DrawText("Press 'A' (Add), 'S' (Subtract), 'M' (Multiply), 'C' (Copy Result to Clipboard)", Color.Gray, 10, 30);
-
-            DrawMatrix(_matrixA, 50, 100, "Matrix A");
-            DrawMatrix(_matrixB, 300, 100, "Matrix B");
-            DrawMatrix(_matrixResult, 175, 350, "Result");
-
-            _window.Refresh(60);
-        }
-
-        private void DrawMatrix(Matrix m, double x, double y, string title)
-        {
-            SplashKit.DrawText(title, Color.DarkBlue, x, y - 20);
-            for (int r = 0; r < m.Rows; r++)
-            {
-                for (int c = 0; c < m.Cols; c++)
+                if (SplashKit.MouseClicked(MouseButton.LeftButton))
                 {
-                    double cellX = x + c * 60;
-                    double cellY = y + r * 40;
-                    SplashKit.DrawRectangle(Color.Black, cellX, cellY, 50, 30);
-                    SplashKit.DrawText(m.GetValue(r, c).ToString("0.##"), Color.Black, cellX + 10, cellY + 10);
+                    Point2D mousePos = SplashKit.MousePosition();
+
+                    // Matrix OnClicks Actions
+
+                    // Operation Actions
+                    if (SplashKit.PointInRectangle(mousePos, _addButton))
+                    {
+                        // Handle addition
+                        Console.WriteLine("Button Clicked: Add");
+                    }
+                    else if (SplashKit.PointInRectangle(mousePos, _subtractButton))
+                    {
+                        // Handle subtraction
+                        Console.WriteLine("Button Clicked: Subtract");
+                    }
+                    else if (SplashKit.PointInRectangle(mousePos, _multiplyButton))
+                    {
+                        // Handle multiplication
+                        Console.WriteLine("Button Clicked: Multiply");
+                    }
+                    else if (SplashKit.PointInRectangle(mousePos, _transposeButton))
+                    {
+                        // Handle transpose
+                        Console.WriteLine("Button Clicked: Transpose");
+                    }
+                    else if (SplashKit.PointInRectangle(mousePos, _inverseButton))
+                    {
+                        // Handle inverse
+                        Console.WriteLine("Button Clicked: Inverse");
+                    }
+
+                    // Adding Matrices OnClick
+                    if (SplashKit.PointInRectangle(mousePos, _matrixEntryBox))
+                    {
+                        // Handle matrix entry box click, maybe open a new window or allow typing in the box
+                        Console.WriteLine("Button Clicked: Matrix Entry Box");
+
+                        // Draw Matrix entry box and grid for entering values
+                        DrawMatrix(3, 3); // Example for a 3x3 matrix,
+                    }
                 }
+
+                SplashKit.RefreshScreen();
             }
+        }
+
+        private void DrawUI()
+        {
+            // Draw the buttons and other UI elements here
+            DrawButton(_addButton, "Add");
+            DrawButton(_subtractButton, "Subtract");
+            DrawButton(_multiplyButton, "Multiply");
+            DrawButton(_transposeButton, "Transpose");
+            DrawButton(_inverseButton, "Inverse");
+            
+            // Draw Matrix entry box
+            SplashKit.FillRectangle(Color.White, _matrixEntryBox);
+            SplashKit.DrawRectangle(Color.Black, _matrixEntryBox);
+        }
+
+        private void DrawButton(Rectangle rect, string text)
+        {
+            // Fill button background and draw a border
+            SplashKit.FillRectangle(Color.LightGray, rect);
+            SplashKit.DrawRectangle(Color.Black, rect);
+
+            // Center the text inside the button
+            Font font = SplashKit.GetSystemFont();
+            const int fontSize = 14;
+            int textWidth = SplashKit.TextWidth(text, font, fontSize);
+            int textHeight = SplashKit.TextHeight(text, font, fontSize);
+            double x = rect.X + (rect.Width - textWidth) / 2;
+            double y = rect.Y + (rect.Height - textHeight) / 2;
+
+            SplashKit.DrawText(text, Color.Black, font, fontSize, x, y);
+        }
+
+        private void DrawMatrix(int Rows, int Cols)
+        {
+            // Draw the matrix entry box and the grid for entering matrix values
+            SplashKit.FillRectangle(Color.White, _matrixEntryBox);
+            SplashKit.DrawRectangle(Color.Black, _matrixEntryBox);
+
+            // Draw the Square Brackets
+            int bracketPadding = 20;
+            SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + bracketPadding, _matrixEntryBox.Y + bracketPadding, _matrixEntryBox.X + bracketPadding, _matrixEntryBox.Y + _matrixEntryBox.Height - bracketPadding);
+            SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + _matrixEntryBox.Width - bracketPadding, _matrixEntryBox.Y + bracketPadding, _matrixEntryBox.X + _matrixEntryBox.Width - bracketPadding, _matrixEntryBox.Y + _matrixEntryBox.Height - bracketPadding);
+
+            // Update Screen
+            SplashKit.RefreshScreen();
+
+            // double cellWidth = _matrixEntryBox.Width / Cols;
+            // double cellHeight = _matrixEntryBox.Height / Rows;
+
+            // for (int i = 0; i < Rows; i++)
+            // {
+            //     for (int j = 0; j < Cols; j++)
+            //     {
+            //         Rectangle cellRect = SplashKit.RectangleFrom(
+            //             _matrixEntryBox.X + j * cellWidth,
+            //             _matrixEntryBox.Y + i * cellHeight,
+            //             cellWidth,
+            //             cellHeight
+            //         );
+            //         SplashKit.DrawRectangle(Color.Black, cellRect);
+            //     }
+            // }
         }
     }
 }

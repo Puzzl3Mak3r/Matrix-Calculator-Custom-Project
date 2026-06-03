@@ -199,10 +199,8 @@ The generated codebase must strictly reflect industry-grade engineering and acad
 Every class, public interface, and mathematical operation block must feature structured summary documentation.
 
 ```csharp
-/// <summary>
 /// Executes a matrix multiplication strategy following linear algebra principles.
 /// Requires the column dimensions of Matrix A to match the row dimensions of Matrix B.
-/// </summary>
 /// <param name="a">The left-hand multiplicand matrix.</param>
 /// <param name="b">The right-hand multiplier matrix.</param>
 /// <returns>A new Matrix object containing the computed dot product results.</returns>
