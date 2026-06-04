@@ -86,6 +86,22 @@ v requires execution
 
 ## 4. Class & Interface Blueprints
 
+### Target Class List (Minimum 10 Classes)
+To meet the 10-30 class requirement, the project will implement the following structures (at least 14 classes):
+1. `Program`
+2. `Operation`
+3. `OperationAddition`
+4. `OperationSubtraction`
+5. `OperationMultiplication`
+6. `OperationTranspose`
+7. `OperationInvert` (Inverts the matrix, so that Matrix * Invert = Identity Matrix)
+8. `CopyToClipboard` (Direct)
+9. `CopyToClipboardLaTeX` (Polymorphed to LaTeX)
+10. `CopyToClipboardASCII` (Polymorphed to Formatted ASCII)
+11. `PasteFromClipboard` (Direct)
+12. `PasteFromClipboardLaTeX` (Polymorphed to LaTeX)
+13. `PasteFromClipboardASCII` (Polymorphed to Formatted ASCII)
+
 The developer agent must construct the codebase using the following precise class breakdowns:
 
 ### Core Domain Entities
