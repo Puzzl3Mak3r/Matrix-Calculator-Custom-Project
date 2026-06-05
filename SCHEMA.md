@@ -76,7 +76,7 @@ v requires execution
 
 ### Pattern 2: Factory Method Pattern (Creational)
 * **Intent:** Centralize matrix creation tasks. This abstracts instantiating multi-dimensional arrays from the UI, letting users spawn complex data presets instantly.
-* **Implementation:** `MatrixFactory` intercepts requests for specific presets (e.g., Identity Matrices or Zero Matrices) and handles their population automatically.
+* **Implementation:** `MatrixFactory` intercepts requests for specific preset Zero Matrix and handles their population automatically. This is to pre-store it the matrix after the size is defined, then the values are populated with the user's input
 
 ### Pattern 3: Memento Pattern (Behavioral)
 * **Intent:** Capture and externalize a matrix's internal state without exposing its grid structure, facilitating the snapshot history needed for copy/paste buffers.
@@ -87,20 +87,23 @@ v requires execution
 ## 4. Class & Interface Blueprints
 
 ### Target Class List (Minimum 10 Classes)
-To meet the 10-30 class requirement, the project will implement the following structures (at least 14 classes):
+To meet the 10-30 class requirement, the project will implement the following structures (at least 16 classes):
 1. `Program`
 2. `Operation`
-3. `OperationAddition`
-4. `OperationSubtraction`
-5. `OperationMultiplication`
-6. `OperationTranspose`
-7. `OperationInvert` (Inverts the matrix, so that Matrix * Invert = Identity Matrix)
-8. `CopyToClipboard` (Direct)
-9. `CopyToClipboardLaTeX` (Polymorphed to LaTeX)
-10. `CopyToClipboardASCII` (Polymorphed to Formatted ASCII)
-11. `PasteFromClipboard` (Direct)
-12. `PasteFromClipboardLaTeX` (Polymorphed to LaTeX)
-13. `PasteFromClipboardASCII` (Polymorphed to Formatted ASCII)
+3. `Matrix`
+4. `OperationAddition`
+5. `OperationSubtraction`
+6. `OperationMultiplication`
+7. `OperationTranspose`
+8. `OperationInvert` (Inverts the matrix, so that Matrix * Invert = Identity Matrix)
+9. `OperationDeterminant` (Calculates the determinant of a matrix)
+10. `CopyToClipboard` (Direct)
+11. `CopyToClipboardLaTeX` (Polymorphed to LaTeX)
+12. `CopyToClipboardASCII` (Polymorphed to Formatted ASCII)
+13. `PasteFromClipboard` (Direct)
+14. `PasteFromClipboardLaTeX` (Polymorphed to LaTeX)
+15. `PasteFromClipboardASCII` (Polymorphed to Formatted ASCII)
+16. `UserInput` (Handles the step-by-step matrix data entry and keystroke management)
 
 The developer agent must construct the codebase using the following precise class breakdowns:
 
@@ -114,9 +117,9 @@ The developer agent must construct the codebase using the following precise clas
   * `public double[,] matrix;` - The 2D array storing matrix elements.
 
 #### `Matrix` (Originator)
-* **Description:** Models and encapsulates a single 2D mathematical array.
+* **Description:** Models and encapsulates a single 2D mathematical array using the `MatrixData` struct.
 * **Fields:**
-  * `private double[,] _grid` - The underlying storage matrix data structure.
+  * `private MatrixData[] matrices` - The underlying array storing the matrix data structure.
   * `private int _rows` - The row count boundary.
   * `private int _cols` - The column count boundary.
 * **Properties:**
@@ -125,19 +128,19 @@ The developer agent must construct the codebase using the following precise clas
 * **Methods:**
   * `public double GetValue(int r, int c)` - Returns cell value with index boundary protection.
   * `public void SetValue(int r, int c, double val)` - Validates input and updates cell data.
-  * `public MatrixMemento CreateMemento()` - Deep-copies `_grid` and instantiates a state snapshot wrapper.
-  * `public void RestoreFromMemento(MatrixMemento memento)` - Replaces current `_grid` configuration using snapshot state.
-  * `public string ToLatexString()` - Iterates through `_grid` to format and return a LaTeX-compliant string structure.
+  * `public MatrixMemento CreateMemento()` - Deep-copies the `matrices` array and instantiates a state snapshot wrapper.
+  * `public void RestoreFromMemento(MatrixMemento memento)` - Replaces current `matrices` configuration using snapshot state.
+  * `public string ToLatexString()` - Iterates through `matrices` to format and return a LaTeX-compliant string structure.
 
 #### `MatrixMemento` (Memento)
 * **Description:** An immutable storage object containing a standalone snapshot of a matrix state.
 * **Fields:**
-  * `private readonly double[,] _stateSnapshot`
+  * `private readonly MatrixData[] _stateSnapshot`
   * `private readonly DateTime _timestamp`
 * **Constructor:**
-  * `public MatrixMemento(double[,] gridData)` - Must deep-copy values to ensure state cannot be manipulated after instantiation.
+  * `public MatrixMemento(MatrixData[] gridData)` - Must deep-copy values to ensure state cannot be manipulated after instantiation.
 * **Properties:**
-  * `public double[,] StateSnapshot { get; }`
+  * `public MatrixData[] StateSnapshot { get; }`
 
 ---
 
@@ -159,6 +162,13 @@ The developer agent must construct the codebase using the following precise clas
 * **Method:**
   * `Matrix Execute(Matrix a, Matrix b)` - Verifies dot-product eligibility: `a.Cols == b.Rows`. Instantiates a new matrix sizing `a.Rows` $\times$ `b.Cols`. Runs iterative dot product accumulation loops.
 
+#### `OperationDeterminant` (Concrete Strategy)
+* **Description:** Calculates the determinant of a matrix.
+* **Fields:**
+  * `private double _determinant`
+* **Method:**
+  * `public double CalculateDeterminant(Matrix a)` - Calculates and returns the determinant of the given square matrix.
+
 ---
 
 ### System Services & Creational Handlers
@@ -175,7 +185,7 @@ The developer agent must construct the codebase using the following precise clas
   * `public static void CopyText(string text)` - Binds text directly to the active OS clipboard environment.
   * `public static string PasteText()` - Safely captures text stream components out of the system clipboard environment.
 
-#### `CalculatorGUI` (User Interface Caretaker)
+#### `Program` (User Interface Caretaker)
 **Description:** The orchestrator module running the SplashKit window event loop. Intercepts mouse coordinates to identify active matrix cells and routes operational requests to strategies.
 * **Fields:**
   * `private Matrix _matrixA`
@@ -183,6 +193,18 @@ The developer agent must construct the codebase using the following precise clas
   * `private Matrix _matrixResult`
   * `private MatrixOperations _activeStrategy`
   * `private MatrixMemento _internalClipboard`
+
+#### `UserInput`
+* **Description:** Manages the sequential or cell-by-cell text entry for a matrix. Captures keystrokes, handles backspace for correcting or navigating to the previous entry, and processes the final confirmation to store the matrix data.
+* **Fields:**
+  * `private string _currentBuffer` - Holds the current cell's input string.
+  * `private List<double> _parsedValues` - Holds the sequential accepted inputs.
+  * `private int _targetRows` and `private int _targetCols` - The dimensions being filled.
+* **Methods:**
+  * `public void ProcessKey(KeyCode key)` - Interprets SplashKit keystrokes, appending to the buffer or handling backspace/enter.
+  * `public void Backspace()` - Removes the last character in the buffer. If empty, reverts to the previous cell's entry for correction.
+  * `public void Confirm()` - Parses `_currentBuffer`, adds it to `_parsedValues`, and advances to the next cell. If all cells are filled, signals completion.
+  * `public bool IsComplete()` - Returns true when all cells (`_targetRows * _targetCols`) have been confirmed.
 
 ---
 

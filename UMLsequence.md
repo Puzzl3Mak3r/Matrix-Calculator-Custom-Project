@@ -9,6 +9,7 @@ sequenceDiagram
     actor User
     participant GUI as Program (Main Loop)
     participant Strategy as OperationAddition
+    participant Factory as MatrixFactory
     participant MatA as Matrix A
     participant MatB as Matrix B
     participant MatRes as Matrix Result
@@ -20,10 +21,16 @@ sequenceDiagram
     activate Strategy
     
     Strategy->>Strategy: CheckDimensions(Matrix A, Matrix B)
-    Strategy->>MatA: Get dimensions and values
-    Strategy->>MatB: Get dimensions and values
+    Strategy->>MatA: Get dimensions and MatrixData[]
+    Strategy->>MatB: Get dimensions and MatrixData[]
     
-    Strategy->>MatRes: Create new Matrix (Result)
+    Strategy->>Factory: CreateZeroMatrix(rows, cols)
+    activate Factory
+    Factory-->>MatRes: Instantiates Matrix with MatrixData[]
+    Factory-->>Strategy: Returns MatRes
+    deactivate Factory
+    
+    Strategy->>MatRes: SetValue() / Populates MatrixData
     Strategy-->>GUI: Return Matrix Result
     deactivate Strategy
     

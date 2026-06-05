@@ -16,6 +16,17 @@ classDiagram
         -DrawMatrix(int Rows, int Cols)
     }
 
+    class UserInput {
+        -string _currentBuffer
+        -List~double~ _parsedValues
+        -int _targetRows
+        -int _targetCols
+        +ProcessKey(KeyCode key)
+        +Backspace()
+        +Confirm()
+        +IsComplete() bool
+    }
+
     %% Data Structures & Domain
     class MatrixData {
         <<struct>>
@@ -25,7 +36,7 @@ classDiagram
     }
 
     class Matrix {
-        -double[,] _grid
+        -MatrixData[] matrices
         -int _rows
         -int _cols
         +GetValue(int r, int c) double
@@ -43,7 +54,6 @@ classDiagram
 
     class MatrixFactory {
         +CreateZeroMatrix(int rows, int cols) Matrix
-        +CreateIdentityMatrix(int size) Matrix
     }
 
     %% Strategy Pattern for Operations
@@ -53,11 +63,44 @@ classDiagram
         +CheckDimensions(Matrix a, Matrix b) bool
     }
 
+    class OperationAddition {
+        +AddMatrices(Matrix a, Matrix b) Matrix
+    }
+
+    class OperationSubtraction {
+        +SubtractMatrices(Matrix a, Matrix b) Matrix
+    }
+
+    class OperationMultiplication {
+        +MultiplyMatrices(Matrix a, Matrix b) Matrix
+    }
+
+    class OperationTranspose {
+        +TransposeMatrix(Matrix a) Matrix
+    }
+
+    class OperationInvert {
+        +InvertMatrix(Matrix a) Matrix
+    }
+
+    class OperationDeterminant {
+        -double _determinant
+        +CalculateDeterminant(Matrix a) double
+    }    
+
     %% Relationships
     Program --> Matrix : Manages
+    Program --> UserInput : Uses
     Program --> Operation : Uses Strategy
+    Program --> MatrixFactory : Uses
     Matrix --> MatrixMemento : Creates / Restores
+    MatrixFactory --> Matrix : Creates
+    Matrix --> MatrixData : Uses
     Operation <|-- OperationAddition
     Operation <|-- OperationSubtraction
     Operation <|-- OperationMultiplication
+    Operation <|-- OperationTranspose
+    OperationDeterminant <|-- OperationInvert
+    Operation <|-- OperationInvert
+    Operation <|-- OperationDeterminant
 ```
