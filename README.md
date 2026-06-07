@@ -30,12 +30,6 @@ classDiagram
     }
 
     %% Data Structures & Domain
-    class MatrixData {
-        <<struct>>
-        +int rows
-        +int cols
-        +double[,] matrix
-    }
 
     class Matrix {
         -MatrixData[] matrices
@@ -56,6 +50,28 @@ classDiagram
 
     class MatrixFactory {
         +CreateZeroMatrix(int rows, int cols) Matrix
+    }
+    class MatrixData {
+        <<struct>>
+        +int rows
+        +int cols
+        +double[,] matrix
+    }
+
+    %% Copy + Paste
+    class CopyPaste {
+        +CopyToClipboard(string text)
+        +PasteFromClipboard() string
+    }
+
+    class CopyPasteLaTeX {
+        +CopyToClipboard(string text)
+        +PasteFromClipboard() string
+    }
+
+    class CopyPasteASCII {
+        +CopyToClipboard(string text)
+        +PasteFromClipboard() string
     }
 
     %% Strategy Pattern for Operations
@@ -88,13 +104,14 @@ classDiagram
     class OperationDeterminant {
         -double _determinant
         +CalculateDeterminant(Matrix a) double
-    }    
+    }
 
     %% Relationships
     Program --> Matrix : Manages
     Program --> UserInput : Uses
     Program --> Operation : Uses Strategy
     Program --> MatrixFactory : Uses
+    Program --> CopyPaste : Uses
     Matrix --> MatrixMemento : Creates / Restores
     MatrixFactory --> Matrix : Creates
     Matrix --> MatrixData : Uses
@@ -105,6 +122,8 @@ classDiagram
     OperationDeterminant <|-- OperationInvert
     Operation <|-- OperationInvert
     Operation <|-- OperationDeterminant
+    CopyPaste <|-- CopyPasteLaTeX
+    CopyPaste <|-- CopyPasteASCII
 ```
 
 ## System Sequence Diagram
