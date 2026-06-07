@@ -10,28 +10,33 @@ sequenceDiagram
     participant GUI as Program (Main Loop)
     participant Strategy as OperationAddition
     participant Factory as MatrixFactory
-    participant MatA as Matrix A
-    participant MatB as Matrix B
-    participant MatRes as Matrix Result
+    participant MatA as Matrix (A)
+    participant MatB as Matrix (B)
+    participant MatRes as Matrix (Result)
 
     User->>GUI: Clicks "Add" Button
     GUI->>GUI: PointInRectangle(mousePos, _addButton) checks true
     
-    GUI->>Strategy: Execute(Matrix A, Matrix B)
+    GUI->>Strategy: Execute(MatA, MatB)
     activate Strategy
     
-    Strategy->>Strategy: CheckDimensions(Matrix A, Matrix B)
-    Strategy->>MatA: Get dimensions and MatrixData[]
-    Strategy->>MatB: Get dimensions and MatrixData[]
+    Strategy->>Strategy: CheckDimensions(MatA, MatB)
+    Strategy->>MatA: Get Rows, Cols
+    Strategy->>MatB: Get Rows, Cols
     
-    Strategy->>Factory: CreateZeroMatrix(rows, cols)
+    Strategy->>Factory: CreateZeroMatrix(Rows, Cols)
     activate Factory
-    Factory-->>MatRes: Instantiates Matrix with MatrixData[]
+    Factory-->>MatRes: Instantiates Matrix
     Factory-->>Strategy: Returns MatRes
     deactivate Factory
     
-    Strategy->>MatRes: SetValue() / Populates MatrixData
-    Strategy-->>GUI: Return Matrix Result
+    loop For each row and col
+        Strategy->>MatA: GetValue(r, c)
+        Strategy->>MatB: GetValue(r, c)
+        Strategy->>MatRes: SetValue(r, c, val)
+    end
+
+    Strategy-->>GUI: Returns MatRes
     deactivate Strategy
     
     GUI->>User: RefreshScreen() / Render Result Matrix
