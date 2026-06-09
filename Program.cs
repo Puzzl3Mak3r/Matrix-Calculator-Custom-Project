@@ -19,8 +19,24 @@ namespace Matrix_Calculator
         private Rectangle _multiplyButton;
         private Rectangle _transposeButton;
         private Rectangle _inverseButton;
+
         // Var for entering data into matrix
         private Rectangle _matrixEntryBox;
+        int tempRows = 0;
+        int tempCols = 0;
+        MatrixData tempMatrix;
+        string currentKey = ""; // To store the user input
+        string previousKey = ""; // To store the previous character for backspace handling
+
+        // State Machine (to handle whats currently happening)
+        enum State
+        {
+            Idle,
+            EnteringData,
+            ExecutingMath
+        };
+        State globalState = State.Idle;
+        State previousState = State.Idle;
 
         // Main Method
         public static void Main()
@@ -53,7 +69,41 @@ namespace Matrix_Calculator
             {
                 SplashKit.ProcessEvents();
 
-                if (SplashKit.MouseClicked(MouseButton.LeftButton))
+                // Print current key pressed
+
+                if (SplashKit.AnyKeyPressed())
+                {
+                    KeyCode currentKeyPressed = KeyCode.UnknownKey;
+
+                    // Loop through all available KeyCodes in the SplashKit enum
+                    foreach (KeyCode key in Enum.GetValues(typeof(KeyCode)))
+                    {
+                        // Check which specific key was just typed
+                        if (SplashKit.KeyTyped(key))
+                        {
+                            currentKeyPressed = key;
+                            break; // Stop looping once we find the pressed key
+                        }
+                    }
+
+                    // SplashKit.KeyName() converts the raw KeyCode into a clean string (e.g., "Space")
+                    if (previousKey != currentKeyPressed.ToString())
+                    {
+                        Console.WriteLine($"Key Pressed: {currentKeyPressed}");
+                        previousKey = currentKeyPressed.ToString(); // Update previous key
+                    }
+                }
+
+                // Dev: Show state machine changes
+                if (globalState != previousState)
+                {
+                    Console.WriteLine($"State changed from {previousState} to {globalState}");
+                    previousState = globalState; // Update previous state
+                }
+
+
+                // Idle
+                if (globalState == State.Idle && SplashKit.MouseClicked(MouseButton.LeftButton))
                 {
                     Point2D mousePos = SplashKit.MousePosition();
 
@@ -92,10 +142,46 @@ namespace Matrix_Calculator
                         // Handle matrix entry box click, maybe open a new window or allow typing in the box
                         Console.WriteLine("Button Clicked: Matrix Entry Box");
 
-                        // Draw Matrix entry box and grid for entering values
-                        DrawMatrix(3, 3); // Example for a 3x3 matrix,
+                        // Change state to entering matrix
+                        globalState = State.EnteringData; // Example for entering matrix A, can be changed based on user selection
+
+                    // Tell SplashKit to start capturing text inside the bounding box
+                    SplashKit.StartReadingText(_matrixEntryBox);
+
+                        // // Draw Matrix entry box and grid for entering values
+                        // DrawMatrix(3, 3); // Example for a 3x3 matrix,
                     }
                 }
+
+                // // Adding Data to Matrix
+                // if (globalState == State.EnteringData)
+                // {
+                //     // Handle data entry for the matrix
+                //     if (SplashKit.KeyTyped(KeyCode.BackspaceKey))
+                //     {
+                //         // Handle backspace, remove last character from current input
+                //         Console.WriteLine("Backspace Pressed");
+                //         // Implement logic to remove last character from the matrix entry
+                //     }
+                //     else if (SplashKit.KeyTyped(KeyCode.EnterKey))
+                //     {
+                //         // Handle enter key, finalize matrix entry
+                //         Console.WriteLine("Enter Key Pressed");
+                //         // Implement logic to finalize matrix entry and maybe change state back to idle
+                //     }
+                //     else
+                //     {
+                //         // Handle other key inputs for matrix entry
+                //         currentKey = SplashKit.LastKeyTyped();
+                //         Console.WriteLine($"Key Typed: {currentKey}");
+                //         // Implement logic to add the typed character to the matrix entry
+                //     }
+                //     if (previousKey != currentKey)
+                //     {
+                //         Console.WriteLine($"Current Key: {currentKey}, Previous Key: {previousKey}");
+                //         previousKey = currentKey; // Update previous character
+                //     }
+                // }
 
                 // Update Screen // Remove\Comment out when final project is done to reduce power consumption, only use when debugging
                 SplashKit.RefreshScreen();
@@ -135,6 +221,10 @@ namespace Matrix_Calculator
 
         private void DrawMatrix(int Rows, int Cols)
         {
+            // Update temp rows and cols for later use when storing matrix data
+            tempRows = Rows;
+            tempCols = Cols;
+
             // Draw the matrix entry box and the grid for entering matrix values
             SplashKit.FillRectangle(Color.White, _matrixEntryBox);
             SplashKit.DrawRectangle(Color.Black, _matrixEntryBox);
@@ -144,25 +234,12 @@ namespace Matrix_Calculator
             SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + bracketPadding, _matrixEntryBox.Y + bracketPadding, _matrixEntryBox.X + bracketPadding, _matrixEntryBox.Y + _matrixEntryBox.Height - bracketPadding);
             SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + _matrixEntryBox.Width - bracketPadding, _matrixEntryBox.Y + bracketPadding, _matrixEntryBox.X + _matrixEntryBox.Width - bracketPadding, _matrixEntryBox.Y + _matrixEntryBox.Height - bracketPadding);
 
+            // Store matrix
+            tempMatrix = MatrixFactory.CreateZMatrix(Rows, Cols);
+            Console.WriteLine($"Matrix created with dimensions: {tempMatrix.rows} x {tempMatrix.cols}");
+
             // Update Screen
             SplashKit.RefreshScreen();
-
-            // double cellWidth = _matrixEntryBox.Width / Cols;
-            // double cellHeight = _matrixEntryBox.Height / Rows;
-
-            // for (int i = 0; i < Rows; i++)
-            // {
-            //     for (int j = 0; j < Cols; j++)
-            //     {
-            //         Rectangle cellRect = SplashKit.RectangleFrom(
-            //             _matrixEntryBox.X + j * cellWidth,
-            //             _matrixEntryBox.Y + i * cellHeight,
-            //             cellWidth,
-            //             cellHeight
-            //         );
-            //         SplashKit.DrawRectangle(Color.Black, cellRect);
-            //     }
-            // }
         }
 
         private void ClearBoard()
@@ -170,6 +247,11 @@ namespace Matrix_Calculator
             // Clear the matrix entry box
             SplashKit.FillRectangle(Color.White, _matrixEntryBox);
             SplashKit.DrawRectangle(Color.Black, _matrixEntryBox);
+            // Reset matrix data
+            tempMatrix = new MatrixData();
+            tempRows = 0;
+            tempCols = 0;
+            Console.WriteLine("Matrix cleared");
         }
     }
 }
