@@ -24,14 +24,14 @@ namespace Matrix_Calculator
         private Rectangle _matrixEntryBox;
         int tempRows = 0;
         int tempCols = 0;
+        string tempData = ""; // MultiPurpose string to store user input
         MatrixData tempMatrix;
         string currentKey = ""; // To store the user input
-        string previousKey = ""; // To store the previous character for backspace handling
-
         // State Machine (to handle whats currently happening)
         enum State
         {
             Idle,
+            EnteringDimensions,
             EnteringData,
             ExecutingMath
         };
@@ -68,8 +68,11 @@ namespace Matrix_Calculator
             while (!_window.CloseRequested)
             {
                 SplashKit.ProcessEvents();
+                currentKey = ""; // Reset current key each frame
 
+                // ---------------------------------------------------------
                 // Print current key pressed
+                // ---------------------------------------------------------
 
                 if (SplashKit.AnyKeyPressed())
                 {
@@ -82,19 +85,23 @@ namespace Matrix_Calculator
                         if (SplashKit.KeyTyped(key))
                         {
                             currentKeyPressed = key;
+                            Console.WriteLine($"Key Pressed: {currentKeyPressed}"); // Dev: Print the raw KeyCode to console for debugging
                             break; // Stop looping once we find the pressed key
                         }
                     }
 
-                    // SplashKit.KeyName() converts the raw KeyCode into a clean string (e.g., "Space")
-                    if (previousKey != currentKeyPressed.ToString())
+                    if (currentKeyPressed != KeyCode.UnknownKey)
                     {
-                        Console.WriteLine($"Key Pressed: {currentKeyPressed}");
-                        previousKey = currentKeyPressed.ToString(); // Update previous key
+                        currentKey = currentKeyPressed.ToString();
                     }
                 }
 
-                // Dev: Show state machine changes
+
+
+                // ---------------------------------------------------------
+                // State Machine
+                // ---------------------------------------------------------
+
                 if (globalState != previousState)
                 {
                     Console.WriteLine($"State changed from {previousState} to {globalState}");
@@ -102,7 +109,11 @@ namespace Matrix_Calculator
                 }
 
 
-                // Idle
+
+                // ---------------------------------------------------------
+                // State: Idle
+                // ---------------------------------------------------------
+
                 if (globalState == State.Idle && SplashKit.MouseClicked(MouseButton.LeftButton))
                 {
                     Point2D mousePos = SplashKit.MousePosition();
@@ -139,49 +150,133 @@ namespace Matrix_Calculator
                     // Adding Matrices OnClick
                     if (SplashKit.PointInRectangle(mousePos, _matrixEntryBox))
                     {
-                        // Handle matrix entry box click, maybe open a new window or allow typing in the box
-                        Console.WriteLine("Button Clicked: Matrix Entry Box");
-
                         // Change state to entering matrix
-                        globalState = State.EnteringData; // Example for entering matrix A, can be changed based on user selection
-
-                    // Tell SplashKit to start capturing text inside the bounding box
-                    SplashKit.StartReadingText(_matrixEntryBox);
-
-                        // // Draw Matrix entry box and grid for entering values
-                        // DrawMatrix(3, 3); // Example for a 3x3 matrix,
+                        globalState = State.EnteringDimensions; // Example for entering matrix A, can be changed based on user selection
                     }
                 }
+                
 
-                // // Adding Data to Matrix
-                // if (globalState == State.EnteringData)
-                // {
-                //     // Handle data entry for the matrix
-                //     if (SplashKit.KeyTyped(KeyCode.BackspaceKey))
-                //     {
-                //         // Handle backspace, remove last character from current input
-                //         Console.WriteLine("Backspace Pressed");
-                //         // Implement logic to remove last character from the matrix entry
-                //     }
-                //     else if (SplashKit.KeyTyped(KeyCode.EnterKey))
-                //     {
-                //         // Handle enter key, finalize matrix entry
-                //         Console.WriteLine("Enter Key Pressed");
-                //         // Implement logic to finalize matrix entry and maybe change state back to idle
-                //     }
-                //     else
-                //     {
-                //         // Handle other key inputs for matrix entry
-                //         currentKey = SplashKit.LastKeyTyped();
-                //         Console.WriteLine($"Key Typed: {currentKey}");
-                //         // Implement logic to add the typed character to the matrix entry
-                //     }
-                //     if (previousKey != currentKey)
-                //     {
-                //         Console.WriteLine($"Current Key: {currentKey}, Previous Key: {previousKey}");
-                //         previousKey = currentKey; // Update previous character
-                //     }
-                // }
+                // ---------------------------------------------------------
+                // State: EnteringDimensions
+                // ---------------------------------------------------------
+
+                if (globalState == State.EnteringDimensions)
+                {
+                    // Enter Row, then Column dimensions, then move to EnteringData state
+                    if (!string.IsNullOrEmpty(currentKey))
+                    {
+                        // Format the raw KeyCode string
+                        string cache = GetValidNum(currentKey); 
+                        
+                        // Verify it is a valid key (0-9, minus, period, or Backspace)
+                        bool isValid = (cache == "Enter" ||
+                                        cache == "Backspace" ||
+                                        (cache.Length == 1 && char.IsDigit(cache[0])));
+                        
+                        if (isValid)
+                        {
+                            Console.WriteLine($"Validated Key: '{cache}'");
+                            if (cache == "Backspace")
+                            {
+                                if (tempData.Length > 0)
+                                {
+                                    tempData = tempData.Substring(0, tempData.Length - 1); // Remove last character
+                                    Console.WriteLine($"Current Input after Backspace: '{tempData}'");
+                                }
+                            } else if (cache == "Enter")
+                            {
+                                if (tempData.Length > 0)
+                                {
+                                    if (tempRows == 0)
+                                    {
+                                        tempRows = int.Parse(tempData);
+                                        Console.WriteLine($"Rows set to: {tempRows}");
+                                    }
+                                    else if (tempCols == 0)
+                                    {
+                                        tempCols = int.Parse(tempData);
+                                        Console.WriteLine($"Columns set to: {tempCols}");
+                                        DrawMatrix(tempRows, tempCols); // This also changes State
+                                    }
+                                    tempData = ""; // Reset tempData for next input
+                                }
+                            }
+                            else
+                            {
+                                tempData += cache; // Append valid key to tempData
+                                Console.WriteLine($"Current Input: '{tempData}'");
+                            }
+                        }
+                    }
+                }
+                
+
+                // ---------------------------------------------------------
+                // State: EnteringData
+                // ---------------------------------------------------------
+
+                if (globalState == State.EnteringData)
+                {
+                    // // Add Zero Matrix, Reset tempRows and tempCols
+                    // if (tempRows > 0 && tempCols > 0)
+                    // {
+                    //     // tempRows = 0;
+                    //     // tempCols = 0;
+                    // } else { Console.WriteLine($"ERROR: Invalid matrix dimensions: {tempRows} x {tempCols}"); globalState = State.Idle; }
+                    
+                    // Populate the Zero Matrix data
+                    if (!string.IsNullOrEmpty(currentKey))
+                    {
+                        // Format the raw KeyCode string
+                        string cache = GetValidNum(currentKey);
+                        
+                        // Verify it is a valid key (0-9, minus, period, or Backspace)
+                        bool isValid = (cache == "Enter" ||
+                                        cache == "." ||
+                                        cache == "-" ||
+                                        cache == "Backspace" ||
+                                        (cache.Length == 1 && char.IsDigit(cache[0])));
+                        
+                        if (isValid)
+                        {
+                            Console.WriteLine($"Validated Key: '{cache}'");
+                            if (cache == "Backspace")
+                            {
+                                if (tempData.Length > 0)
+                                {
+                                    tempData = tempData.Substring(0, tempData.Length - 1); // Remove last character
+                                    Console.WriteLine($"Current Input after Backspace: '{tempData}'");
+                                }
+                            }
+                            else if (cache == "Enter")
+                            {
+                                if (tempData.Length > 0)
+                                {
+                                    // Fill that data in Matrix cell (tempRows, tempCols)
+                                    Console.WriteLine($"Placing value '{tempData}' in cell ({tempRows}, {tempCols})");
+                                    tempMatrix.matrix[tempRows, tempCols] = double.Parse(tempData);
+                                    tempData = ""; // Reset tempData for next input
+                                    tempCols++; // Increment column
+                                    if (tempCols >= tempMatrix.cols)
+                                    {
+                                        tempCols = 0; // Reset column
+                                        tempRows++; // Increment row
+                                        if (tempRows >= tempMatrix.rows)
+                                        {
+                                            Console.WriteLine("Matrix input complete");
+                                            globalState = State.Idle; // Move back to idle after filling the matrix
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                tempData += cache; // Append valid key to tempData
+                                Console.WriteLine($"Current Input: '{tempData}'");
+                            }
+                        }
+                    }
+                }
 
                 // Update Screen // Remove\Comment out when final project is done to reduce power consumption, only use when debugging
                 SplashKit.RefreshScreen();
@@ -221,9 +316,10 @@ namespace Matrix_Calculator
 
         private void DrawMatrix(int Rows, int Cols)
         {
-            // Update temp rows and cols for later use when storing matrix data
-            tempRows = Rows;
-            tempCols = Cols;
+            Console.WriteLine($"Drawing matrix with dimensions: {Rows} x {Cols}");
+            // // Update temp rows and cols for later use when storing matrix data
+            // tempRows = Rows;
+            // tempCols = Cols;
 
             // Draw the matrix entry box and the grid for entering matrix values
             SplashKit.FillRectangle(Color.White, _matrixEntryBox);
@@ -238,8 +334,8 @@ namespace Matrix_Calculator
             tempMatrix = MatrixFactory.CreateZMatrix(Rows, Cols);
             Console.WriteLine($"Matrix created with dimensions: {tempMatrix.rows} x {tempMatrix.cols}");
 
-            // Update Screen
-            SplashKit.RefreshScreen();
+            // Update State
+            globalState = State.EnteringData;
         }
 
         private void ClearBoard()
@@ -252,6 +348,34 @@ namespace Matrix_Calculator
             tempRows = 0;
             tempCols = 0;
             Console.WriteLine("Matrix cleared");
+        }
+
+        private string GetValidNum(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return "";
+
+            // Trim "Key" at the end if it exists (e.g. "Num1Key" -> "Num1", "BackspaceKey" -> "Backspace")
+            if (input.EndsWith("Key"))
+            {
+                input = input.Substring(0, input.Length - 3);
+            }
+
+            // If it starts with "Num" (e.g. "Num1"), trim "Num" so we just get the number ("1")
+            if (input.StartsWith("Num"))
+            {
+                input = input.Substring(3);
+            }
+            else if (input.StartsWith("Keypad"))
+            {
+                input = input.Substring(6); // Trim "Keypad" (e.g. "Keypad1" -> "1")
+            }
+
+            // Map special character formats
+            if (input == "Minus") return "-";
+            if (input == "Period") return ".";
+            if (input == "Return") return "Enter";
+
+            return input;
         }
     }
 }
