@@ -24,6 +24,8 @@ namespace Matrix_Calculator
         private Rectangle _matrixEntryBox;
         int tempRows = 0;
         int tempCols = 0;
+        int currentCellX = 0;
+        int currentCellY = 0;
         string tempData = ""; // MultiPurpose string to store user input
         MatrixData tempMatrix;
         string currentKey = ""; // To store the user input
@@ -150,11 +152,13 @@ namespace Matrix_Calculator
                     // Adding Matrices OnClick
                     if (SplashKit.PointInRectangle(mousePos, _matrixEntryBox))
                     {
+                        ClearBoard();
                         // Change state to entering matrix
                         globalState = State.EnteringDimensions; // Example for entering matrix A, can be changed based on user selection
                     }
                 }
-                
+
+
 
                 // ---------------------------------------------------------
                 // State: EnteringDimensions
@@ -182,6 +186,7 @@ namespace Matrix_Calculator
                                 {
                                     tempData = tempData.Substring(0, tempData.Length - 1); // Remove last character
                                     Console.WriteLine($"Current Input after Backspace: '{tempData}'");
+                                    UpdateMatrixDisplay();
                                 }
                             } else if (cache == "Enter")
                             {
@@ -191,25 +196,29 @@ namespace Matrix_Calculator
                                     {
                                         tempRows = int.Parse(tempData);
                                         Console.WriteLine($"Rows set to: {tempRows}");
+                                        tempData = ""; // Reset tempData for next input
+                                        UpdateMatrixDisplay();
                                     }
                                     else if (tempCols == 0)
                                     {
                                         tempCols = int.Parse(tempData);
                                         Console.WriteLine($"Columns set to: {tempCols}");
+                                        tempData = ""; // Reset tempData for next input
                                         DrawMatrix(tempRows, tempCols); // This also changes State
                                     }
-                                    tempData = ""; // Reset tempData for next input
                                 }
                             }
                             else
                             {
                                 tempData += cache; // Append valid key to tempData
                                 Console.WriteLine($"Current Input: '{tempData}'");
+                                UpdateMatrixDisplay();
                             }
                         }
                     }
                 }
-                
+
+
 
                 // ---------------------------------------------------------
                 // State: EnteringData
@@ -217,13 +226,6 @@ namespace Matrix_Calculator
 
                 if (globalState == State.EnteringData)
                 {
-                    // // Add Zero Matrix, Reset tempRows and tempCols
-                    // if (tempRows > 0 && tempCols > 0)
-                    // {
-                    //     // tempRows = 0;
-                    //     // tempCols = 0;
-                    // } else { Console.WriteLine($"ERROR: Invalid matrix dimensions: {tempRows} x {tempCols}"); globalState = State.Idle; }
-                    
                     // Populate the Zero Matrix data
                     if (!string.IsNullOrEmpty(currentKey))
                     {
@@ -246,26 +248,66 @@ namespace Matrix_Calculator
                                 {
                                     tempData = tempData.Substring(0, tempData.Length - 1); // Remove last character
                                     Console.WriteLine($"Current Input after Backspace: '{tempData}'");
+                                    UpdateMatrixDisplay();
                                 }
                             }
                             else if (cache == "Enter")
                             {
-                                if (tempData.Length > 0)
+                                // Check if multiple decimal points or minus signs are being entered, if so ignore the input
+                                if (cache == "." && tempData.Contains("."))
                                 {
-                                    // Fill that data in Matrix cell (tempRows, tempCols)
-                                    Console.WriteLine($"Placing value '{tempData}' in cell ({tempRows}, {tempCols})");
-                                    tempMatrix.matrix[tempRows, tempCols] = double.Parse(tempData);
-                                    tempData = ""; // Reset tempData for next input
-                                    tempCols++; // Increment column
-                                    if (tempCols >= tempMatrix.cols)
+                                    Console.WriteLine("Invalid input: Multiple decimal points");
+                                } else if (cache == "-" && tempData.Contains("-"))
+                                {
+                                    Console.WriteLine("Invalid input: Multiple minus signs");
+                                }
+                                else if (cache == "-" && tempData.Length > 0)
+                                {
+                                    Console.WriteLine("Invalid input: Minus sign can only be at the beginning");
+                                }
+                                else if (tempData.Length == 0)
+                                {
+                                    Console.WriteLine("Invalid input: No number entered");
+                                }
+                                else
+                                {
+                                    if (tempData.Length > 0)
                                     {
-                                        tempCols = 0; // Reset column
-                                        tempRows++; // Increment row
-                                        if (tempRows >= tempMatrix.rows)
+                                        // Fill that data in Matrix cell (tempRows, currentCellX)
+                                        Console.WriteLine($"Placing value '{tempData}' in cell ({currentCellY}, {currentCellX})");
+                                        tempMatrix.matrix[currentCellY, currentCellX] = double.Parse(tempData);
+                                        tempData = ""; // Reset tempData for next input
+                                        currentCellX++; // Increment column
+                                        if (currentCellX >= tempMatrix.cols)
                                         {
-                                            Console.WriteLine("Matrix input complete");
-                                            globalState = State.Idle; // Move back to idle after filling the matrix
+                                            currentCellX = 0; // Reset column
+                                            currentCellY++; // Increment row
+                                            if (currentCellY >= tempMatrix.rows)
+                                            {
+                                                Console.WriteLine("Matrix input complete");
+                                                globalState = State.Idle; // Move back to idle after filling the matrix
+
+                                                // Print the filled matrix for debugging
+                                                Console.WriteLine("Matrix contents:");
+                                                for (int i = 0; i < tempMatrix.rows; i++)
+                                                {    for (int j = 0; j < tempMatrix.cols; j++)
+                                                    {
+                                                        Console.Write($"{tempMatrix.matrix[i, j]} ");
+                                                    }
+                                                    Console.WriteLine();
+                                                }
+
+                                                // Draw the filled matrix on the screen
+                                                for (int i = 0; i < tempMatrix.rows; i++)
+                                                {
+                                                    for (int j = 0; j < tempMatrix.cols; j++)
+                                                    {
+                                                        // Draw here
+                                                    }
+                                                }
+                                            }
                                         }
+                                        UpdateMatrixDisplay();
                                     }
                                 }
                             }
@@ -273,6 +315,9 @@ namespace Matrix_Calculator
                             {
                                 tempData += cache; // Append valid key to tempData
                                 Console.WriteLine($"Current Input: '{tempData}'");
+
+                                // Draw the current input
+                                UpdateMatrixDisplay();
                             }
                         }
                     }
@@ -314,6 +359,33 @@ namespace Matrix_Calculator
             SplashKit.DrawText(text, Color.Black, font, fontSize, x, y);
         }
 
+        private void UpdateMatrixDisplay()
+        {
+            // Clear the matrix entry box
+            SplashKit.FillRectangle(Color.White, _matrixEntryBox);
+            SplashKit.DrawRectangle(Color.Black, _matrixEntryBox);
+
+            if (globalState == State.EnteringData)
+            {
+                // Draw the Square Brackets
+                int bracketPadding = 20;
+                SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + bracketPadding, _matrixEntryBox.Y + bracketPadding, _matrixEntryBox.X + bracketPadding, _matrixEntryBox.Y + _matrixEntryBox.Height - bracketPadding);
+                SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + _matrixEntryBox.Width - bracketPadding, _matrixEntryBox.Y + bracketPadding, _matrixEntryBox.X + _matrixEntryBox.Width - bracketPadding, _matrixEntryBox.Y + _matrixEntryBox.Height - bracketPadding);
+            }
+
+            if (!string.IsNullOrEmpty(tempData))
+            {
+                Font font = SplashKit.GetSystemFont();
+                const int fontSize = 24;
+                int textWidth = SplashKit.TextWidth(tempData, font, fontSize);
+                int textHeight = SplashKit.TextHeight(tempData, font, fontSize);
+                double x = _matrixEntryBox.X + (_matrixEntryBox.Width - textWidth) / 2;
+                double y = _matrixEntryBox.Y + (_matrixEntryBox.Height - textHeight) / 2;
+
+                SplashKit.DrawText(tempData, Color.Black, font, fontSize, x, y);
+            }
+        }
+
         private void DrawMatrix(int Rows, int Cols)
         {
             Console.WriteLine($"Drawing matrix with dimensions: {Rows} x {Cols}");
@@ -347,6 +419,7 @@ namespace Matrix_Calculator
             tempMatrix = new MatrixData();
             tempRows = 0;
             tempCols = 0;
+            tempData = "";
             Console.WriteLine("Matrix cleared");
         }
 
