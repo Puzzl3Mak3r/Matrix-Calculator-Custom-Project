@@ -1,14 +1,14 @@
 # System Sequence Diagram
 
-Below is the UML Sequence Diagram demonstrating the behavioral flow of the application when a user performs a mathematical operation(s) (Matrix Addition, Subtraction, Multiplication, etc.) using the Strategy Pattern.
+Below is the UML Sequence Diagram demonstrating the behavioral flow of the application when a user performs a mathematical operation (e.g., Matrix Addition) using the Strategy Pattern.
 
-To view this diagram, view this file in a markdown editor that supports Mermaid.js (such as Obsidian, GitHub, or VS Code with a Mermaid extension).
+## Matrix Operation Sequence (Addition)
 
 ```mermaid
 sequenceDiagram
     actor User
     participant GUI as Program (Main Loop)
-    participant Strategy as Operation
+    participant Strategy as OperationAddition
     participant Factory as MatrixFactory
     participant MatA as Matrix (A)
     participant MatB as Matrix (B)

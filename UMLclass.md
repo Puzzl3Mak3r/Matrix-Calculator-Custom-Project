@@ -8,12 +8,13 @@ To view this diagram, view this file in a markdown editor that supports Mermaid.
 classDiagram
     %% Core GUI and Application
     class Program {
-        -Window _window
-        +MatrixData[] matrices
+        -Matrix _matrixA
+        -Matrix _matrixB
+        -Matrix _matrixResult
+        -Operation _activeStrategy
+        -MatrixMemento _internalClipboard
         +Main()
         +Run()
-        -DrawUI()
-        -DrawMatrix(int Rows, int Cols)
     }
 
     class UserInput {
@@ -29,10 +30,19 @@ classDiagram
 
     %% Data Structures & Domain
 
+    class MatrixData {
+        <<struct>>
+        +int rows
+        +int cols
+        +double[,] matrix
+    }
+
     class Matrix {
         -MatrixData[] matrices
         -int _rows
         -int _cols
+        +int Rows
+        +int Cols
         +GetValue(int r, int c) double
         +SetValue(int r, int c, double val)
         +CreateMemento() MatrixMemento
@@ -41,19 +51,15 @@ classDiagram
     }
 
     class MatrixMemento {
-        -double[,] _stateSnapshot
+        -MatrixData[] _stateSnapshot
         -DateTime _timestamp
-        +MatrixMemento(double[,] gridData)
+        +MatrixData[] StateSnapshot
+        +MatrixMemento(MatrixData[] gridData)
     }
 
     class MatrixFactory {
         +CreateZeroMatrix(int rows, int cols) Matrix
-    }
-    class MatrixData {
-        <<struct>>
-        +int rows
-        +int cols
-        +double[,] matrix
+        +CreateIdentityMatrix(int size) Matrix
     }
 
     %% Copy + Paste
@@ -80,23 +86,23 @@ classDiagram
     }
 
     class OperationAddition {
-        +AddMatrices(Matrix a, Matrix b) Matrix
+        +Execute(Matrix a, Matrix b) Matrix
     }
 
     class OperationSubtraction {
-        +SubtractMatrices(Matrix a, Matrix b) Matrix
+        +Execute(Matrix a, Matrix b) Matrix
     }
 
     class OperationMultiplication {
-        +MultiplyMatrices(Matrix a, Matrix b) Matrix
+        +Execute(Matrix a, Matrix b) Matrix
     }
 
     class OperationTranspose {
-        +TransposeMatrix(Matrix a) Matrix
+        +Execute(Matrix a, Matrix b) Matrix
     }
 
     class OperationInvert {
-        +InvertMatrix(Matrix a) Matrix
+        +Execute(Matrix a, Matrix b) Matrix
     }
 
     class OperationDeterminant {
@@ -117,7 +123,6 @@ classDiagram
     Operation <|-- OperationSubtraction
     Operation <|-- OperationMultiplication
     Operation <|-- OperationTranspose
-    OperationDeterminant <|-- OperationInvert
     Operation <|-- OperationInvert
     Operation <|-- OperationDeterminant
     CopyPaste <|-- CopyPasteLaTeX

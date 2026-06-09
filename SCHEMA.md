@@ -87,7 +87,7 @@ v requires execution
 ## 4. Class & Interface Blueprints
 
 ### Target Class List (Minimum 10 Classes)
-To meet the 10-30 class requirement, the project will implement the following structures (at least 16 classes):
+To meet the 10-30 class requirement, the project will implement the following structures (at least 13 classes):
 1. `Program`
 2. `Operation`
 3. `Matrix`
@@ -97,13 +97,10 @@ To meet the 10-30 class requirement, the project will implement the following st
 7. `OperationTranspose`
 8. `OperationInvert` (Inverts the matrix, so that Matrix * Invert = Identity Matrix)
 9. `OperationDeterminant` (Calculates the determinant of a matrix)
-10. `CopyToClipboard` (Direct)
-11. `CopyToClipboardLaTeX` (Polymorphed to LaTeX)
-12. `CopyToClipboardASCII` (Polymorphed to Formatted ASCII)
-13. `PasteFromClipboard` (Direct)
-14. `PasteFromClipboardLaTeX` (Polymorphed to LaTeX)
-15. `PasteFromClipboardASCII` (Polymorphed to Formatted ASCII)
-16. `UserInput` (Handles the step-by-step matrix data entry and keystroke management)
+10. `CopyPaste` (Direct)
+11. `CopyPasteLaTeX` (Polymorphed to LaTeX)
+12. `CopyPasteASCII` (Polymorphed to Formatted ASCII)
+13. `UserInput` (Handles the step-by-step matrix data entry and keystroke management)
 
 The developer agent must construct the codebase using the following precise class breakdowns:
 
@@ -179,11 +176,23 @@ The developer agent must construct the codebase using the following precise clas
   * `public static Matrix CreateZeroMatrix(int rows, int cols)` - Allocates a standard blank matrix initialized to 0.0.
   * `public static Matrix CreateIdentityMatrix(int size)` - Generates a square matrix where index `(i, j)` is set to 1.0 if `i == j`, and 0.0 otherwise.
 
-#### `ClipboardService` (System Wrapper)
-* **Description:** Provides cross-platform text interfacing between the application layer and the host operating system's clipboard stack.
+#### `CopyPaste` (System Wrapper)
+* **Description:** Provides cross-platform text interfacing between the application layer and the host operating system's clipboard stack for raw matrix data. Acts as the base class for format-specific clipboard operations.
 * **Methods:**
-  * `public static void CopyText(string text)` - Binds text directly to the active OS clipboard environment.
-  * `public static string PasteText()` - Safely captures text stream components out of the system clipboard environment.
+  * `public virtual void CopyToClipboard(string text)` - Binds raw text directly to the active OS clipboard environment.
+  * `public virtual string PasteFromClipboard()` - Safely captures text stream components out of the system clipboard environment.
+
+#### `CopyPasteLaTeX` (Polymorphic Clipboard Handler)
+* **Description:** Inherits from `CopyPaste`. Handles formatting matrix data into LaTeX syntax before copying, and parsing LaTeX syntax when pasting.
+* **Methods:**
+  * `public override void CopyToClipboard(string text)` - Formats to LaTeX and copies to clipboard.
+  * `public override string PasteFromClipboard()` - Pastes from clipboard and parses LaTeX.
+
+#### `CopyPasteASCII` (Polymorphic Clipboard Handler)
+* **Description:** Inherits from `CopyPaste`. Handles formatting matrix data into an ASCII grid before copying, and parsing ASCII grids when pasting.
+* **Methods:**
+  * `public override void CopyToClipboard(string text)` - Formats to ASCII grid and copies to clipboard.
+  * `public override string PasteFromClipboard()` - Pastes from clipboard and parses ASCII grid.
 
 #### `Program` (User Interface Caretaker)
 **Description:** The orchestrator module running the SplashKit window event loop. Intercepts mouse coordinates to identify active matrix cells and routes operational requests to strategies.

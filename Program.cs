@@ -164,5 +164,12 @@ namespace Matrix_Calculator
             //     }
             // }
         }
+
+        private void ClearBoard()
+        {
+            // Clear the matrix entry box
+            SplashKit.FillRectangle(Color.White, _matrixEntryBox);
+            SplashKit.DrawRectangle(Color.Black, _matrixEntryBox);
+        }
     }
 }
