@@ -297,14 +297,15 @@ namespace Matrix_Calculator
                                                     Console.WriteLine();
                                                 }
 
-                                                // Draw the filled matrix on the screen
-                                                for (int i = 0; i < tempMatrix.rows; i++)
-                                                {
-                                                    for (int j = 0; j < tempMatrix.cols; j++)
-                                                    {
-                                                        // Draw here
-                                                    }
-                                                }
+                                                // // Draw the filled matrix on the screen
+                                                // ClearBoard();
+                                                // for (int i = 0; i < tempMatrix.rows; i++)
+                                                // {
+                                                //     for (int j = 0; j < tempMatrix.cols; j++)
+                                                //     {
+                                                //         // Draw here
+                                                //     }
+                                                // }
                                             }
                                         }
                                         UpdateMatrixDisplay();
@@ -368,9 +369,7 @@ namespace Matrix_Calculator
             if (globalState == State.EnteringData)
             {
                 // Draw the Square Brackets
-                int bracketPadding = 20;
-                SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + bracketPadding, _matrixEntryBox.Y + bracketPadding, _matrixEntryBox.X + bracketPadding, _matrixEntryBox.Y + _matrixEntryBox.Height - bracketPadding);
-                SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + _matrixEntryBox.Width - bracketPadding, _matrixEntryBox.Y + bracketPadding, _matrixEntryBox.X + _matrixEntryBox.Width - bracketPadding, _matrixEntryBox.Y + _matrixEntryBox.Height - bracketPadding);
+                DrawBrackets();
             }
 
             if (!string.IsNullOrEmpty(tempData))
@@ -398,9 +397,7 @@ namespace Matrix_Calculator
             SplashKit.DrawRectangle(Color.Black, _matrixEntryBox);
 
             // Draw the Square Brackets
-            int bracketPadding = 20;
-            SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + bracketPadding, _matrixEntryBox.Y + bracketPadding, _matrixEntryBox.X + bracketPadding, _matrixEntryBox.Y + _matrixEntryBox.Height - bracketPadding);
-            SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + _matrixEntryBox.Width - bracketPadding, _matrixEntryBox.Y + bracketPadding, _matrixEntryBox.X + _matrixEntryBox.Width - bracketPadding, _matrixEntryBox.Y + _matrixEntryBox.Height - bracketPadding);
+            DrawBrackets();
 
             // Store matrix
             tempMatrix = MatrixFactory.CreateZMatrix(Rows, Cols);
@@ -449,6 +446,32 @@ namespace Matrix_Calculator
             if (input == "Return") return "Enter";
 
             return input;
+        }
+
+        private void DrawBrackets()
+        {
+            int padding = 20;
+
+            // Draw Left Bits
+            SplashKit.DrawLine(Color.Black,
+                _matrixEntryBox.X + padding,    _matrixEntryBox.Y + padding,
+                _matrixEntryBox.X + 3*padding,  _matrixEntryBox.Y + padding);
+            SplashKit.DrawLine(Color.Black,
+                _matrixEntryBox.X + padding,    _matrixEntryBox.Y + _matrixEntryBox.Height - padding,
+                _matrixEntryBox.X + 3*padding,  _matrixEntryBox.Y + _matrixEntryBox.Height - padding);
+
+            // Draw Right Bits
+            SplashKit.DrawLine(Color.Black,
+                _matrixEntryBox.X + _matrixEntryBox.Width - padding,    _matrixEntryBox.Y + padding,
+                _matrixEntryBox.X + _matrixEntryBox.Width - 3*padding,  _matrixEntryBox.Y + padding);
+            SplashKit.DrawLine(Color.Black,
+                _matrixEntryBox.X + _matrixEntryBox.Width - padding,    _matrixEntryBox.Y + _matrixEntryBox.Height - padding,
+                _matrixEntryBox.X + _matrixEntryBox.Width - 3*padding,  _matrixEntryBox.Y + _matrixEntryBox.Height - padding);
+
+            // Draw Sides
+            SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + padding, _matrixEntryBox.Y + padding, _matrixEntryBox.X + padding, _matrixEntryBox.Y + _matrixEntryBox.Height - padding);
+            SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + _matrixEntryBox.Width - padding, _matrixEntryBox.Y + padding, _matrixEntryBox.X + _matrixEntryBox.Width - padding, _matrixEntryBox.Y + _matrixEntryBox.Height - padding);
+
         }
     }
 }
