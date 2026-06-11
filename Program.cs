@@ -30,7 +30,7 @@ namespace Matrix_Calculator
         int tempCols = 0;
         int currentCellX = 0;
         int currentCellY = 0;
-        string messageText = "";
+        string messageText = "Click to add Matrix";
         string tempData = ""; // MultiPurpose string to store user input
         MatrixData tempMatrix;
         string currentKey = ""; // To store the user input
@@ -78,12 +78,14 @@ namespace Matrix_Calculator
             // Clear screen to prevent ghosting
             SplashKit.ClearScreen(Color.White);
             DrawUI();
+            messageText = "Click to add matrix";
+            UpdateMessageText();
 
             // Main event loop
             while (!_window.CloseRequested)
             {
                 SplashKit.ProcessEvents();
-                currentKey = ""; // Reset current key each frame
+                currentKey = ""; // Reset current key each update
 
                 // ---------------------------------------------------------
                 // Print current key pressed
@@ -129,49 +131,47 @@ namespace Matrix_Calculator
                 // State: Idle
                 // ---------------------------------------------------------
 
-                if (globalState == State.Idle && SplashKit.MouseClicked(MouseButton.LeftButton))
+                if (globalState == State.Idle )
                 {
                     // Vars
                     Point2D mousePos = SplashKit.MousePosition();
 
                     // Matrix OnClicks Actions
-                    // Prompt to click MatrixBox
-                    messageText = "Click to add matrix";
-                    UpdateMessageText();
+                    if (SplashKit.MouseClicked(MouseButton.LeftButton))
+                    {
+                        // Operation Actions
+                        if (SplashKit.PointInRectangle(mousePos, _addButton))
+                        {
+                            // Handle addition
+                            Console.WriteLine("Button Clicked: Add");
+                        }
+                        else if (SplashKit.PointInRectangle(mousePos, _subtractButton))
+                        {
+                            // Handle subtraction
+                            Console.WriteLine("Button Clicked: Subtract");
+                        }
+                        else if (SplashKit.PointInRectangle(mousePos, _multiplyButton))
+                        {
+                            // Handle multiplication
+                            Console.WriteLine("Button Clicked: Multiply");
+                        }
+                        else if (SplashKit.PointInRectangle(mousePos, _transposeButton))
+                        {
+                            // Handle transpose
+                            Console.WriteLine("Button Clicked: Transpose");
+                        }
+                        else if (SplashKit.PointInRectangle(mousePos, _inverseButton))
+                        {
+                            // Handle inverse
+                            Console.WriteLine("Button Clicked: Inverse");
+                        }
 
-                    // Operation Actions
-                    if (SplashKit.PointInRectangle(mousePos, _addButton))
-                    {
-                        // Handle addition
-                        Console.WriteLine("Button Clicked: Add");
-                    }
-                    else if (SplashKit.PointInRectangle(mousePos, _subtractButton))
-                    {
-                        // Handle subtraction
-                        Console.WriteLine("Button Clicked: Subtract");
-                    }
-                    else if (SplashKit.PointInRectangle(mousePos, _multiplyButton))
-                    {
-                        // Handle multiplication
-                        Console.WriteLine("Button Clicked: Multiply");
-                    }
-                    else if (SplashKit.PointInRectangle(mousePos, _transposeButton))
-                    {
-                        // Handle transpose
-                        Console.WriteLine("Button Clicked: Transpose");
-                    }
-                    else if (SplashKit.PointInRectangle(mousePos, _inverseButton))
-                    {
-                        // Handle inverse
-                        Console.WriteLine("Button Clicked: Inverse");
-                    }
-
-                    // Adding Matrices OnClick
-                    if (SplashKit.PointInRectangle(mousePos, _matrixEntryBox))
-                    {
-                        ClearBoard();
-                        // Change state to entering matrix
-                        globalState = State.EnteringDimensions; // Example for entering matrix A, can be changed based on user selection
+                        // Adding Matrices OnClick
+                        if (SplashKit.PointInRectangle(mousePos, _matrixEntryBox))
+                        {
+                            // Change state to entering matrix
+                            globalState = State.EnteringDimensions; // Example for entering matrix A, can be changed based on user selection
+                        }
                     }
                 }
 
@@ -183,9 +183,6 @@ namespace Matrix_Calculator
 
                 if (globalState == State.EnteringDimensions)
                 {
-                    // Prompt to enter rows/columns
-                    messageText = "Enter number of";
-
                     // Enter Row, then Column dimensions, then move to EnteringData state
                     if (!string.IsNullOrEmpty(currentKey))
                     {
@@ -444,7 +441,6 @@ namespace Matrix_Calculator
             Font font = SplashKit.GetSystemFont();
             const int fontSize = 20;
             int messageTextWidth = SplashKit.TextWidth(messageText, font, fontSize);
-            int messageTextHeight = SplashKit.TextHeight(messageText, font, fontSize);
             SplashKit.DrawText(messageText, Color.Black, font, fontSize, _matrixEntryBox.X + (_matrixEntryBox.Width - messageTextWidth) / 2, _matrixEntryBox.Height * 0.5);
         }
 
