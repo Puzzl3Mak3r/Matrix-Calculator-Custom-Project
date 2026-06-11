@@ -12,6 +12,10 @@ namespace Matrix_Calculator
 
     public class Program
     {
+        // ---------------------------------------------------------
+        // Variables & State
+        // ---------------------------------------------------------
+
         // Variables for GUI
         private Window _window;
         private Rectangle _addButton;
@@ -26,6 +30,7 @@ namespace Matrix_Calculator
         int tempCols = 0;
         int currentCellX = 0;
         int currentCellY = 0;
+        string messageText = "";
         string tempData = ""; // MultiPurpose string to store user input
         MatrixData tempMatrix;
         string currentKey = ""; // To store the user input
@@ -39,6 +44,10 @@ namespace Matrix_Calculator
         };
         State globalState = State.Idle;
         State previousState = State.Idle;
+
+        // ---------------------------------------------------------
+        // Initialization
+        // ---------------------------------------------------------
 
         // Main Method
         public static void Main()
@@ -59,6 +68,10 @@ namespace Matrix_Calculator
             _inverseButton    = SplashKit.RectangleFrom(650, 50, 100, 50);
             _matrixEntryBox   = SplashKit.RectangleFrom(50, 150, 700, 400);
         }
+
+        // ---------------------------------------------------------
+        // Main Loop
+        // ---------------------------------------------------------
 
         public void Run()
         {
@@ -118,9 +131,13 @@ namespace Matrix_Calculator
 
                 if (globalState == State.Idle && SplashKit.MouseClicked(MouseButton.LeftButton))
                 {
+                    // Vars
                     Point2D mousePos = SplashKit.MousePosition();
 
                     // Matrix OnClicks Actions
+                    // Prompt to click MatrixBox
+                    messageText = "Click to add matrix";
+                    UpdateMessageText();
 
                     // Operation Actions
                     if (SplashKit.PointInRectangle(mousePos, _addButton))
@@ -166,15 +183,19 @@ namespace Matrix_Calculator
 
                 if (globalState == State.EnteringDimensions)
                 {
+                    // Prompt to enter rows/columns
+                    messageText = "Enter number of";
+
                     // Enter Row, then Column dimensions, then move to EnteringData state
                     if (!string.IsNullOrEmpty(currentKey))
                     {
                         // Format the raw KeyCode string
-                        string cache = GetValidNum(currentKey); 
+                        string cache = GetValidKey(currentKey); 
                         
                         // Verify it is a valid key (0-9, minus, period, or Backspace)
                         bool isValid = (cache == "Enter" ||
                                         cache == "Backspace" ||
+                                        cache == "Escape" ||
                                         (cache.Length == 1 && char.IsDigit(cache[0])));
                         
                         if (isValid)
@@ -188,6 +209,15 @@ namespace Matrix_Calculator
                                     Console.WriteLine($"Current Input after Backspace: '{tempData}'");
                                     UpdateMatrixDisplay();
                                 }
+                            } else if (cache == "Escape")
+                            {
+                                // Exit entering data
+                                tempData = "";
+                                tempRows = 0;
+                                tempCols = 0;
+                                globalState = State.Idle;
+                                ClearBoard();
+                                Console.WriteLine("Matrix input canceled");
                             } else if (cache == "Enter")
                             {
                                 if (tempData.Length > 0)
@@ -197,6 +227,7 @@ namespace Matrix_Calculator
                                         tempRows = int.Parse(tempData);
                                         Console.WriteLine($"Rows set to: {tempRows}");
                                         tempData = ""; // Reset tempData for next input
+                                        messageText += " columns";
                                         UpdateMatrixDisplay();
                                     }
                                     else if (tempCols == 0)
@@ -204,6 +235,7 @@ namespace Matrix_Calculator
                                         tempCols = int.Parse(tempData);
                                         Console.WriteLine($"Columns set to: {tempCols}");
                                         tempData = ""; // Reset tempData for next input
+                                        messageText = "";
                                         DrawMatrix(tempRows, tempCols); // This also changes State
                                     }
                                 }
@@ -226,17 +258,21 @@ namespace Matrix_Calculator
 
                 if (globalState == State.EnteringData)
                 {
+                    // Prompt to enter values
+                    messageText = $"Enter value in cell ({currentCellY}, {currentCellX})";
+
                     // Populate the Zero Matrix data
                     if (!string.IsNullOrEmpty(currentKey))
                     {
                         // Format the raw KeyCode string
-                        string cache = GetValidNum(currentKey);
+                        string cache = GetValidKey(currentKey);
                         
                         // Verify it is a valid key (0-9, minus, period, or Backspace)
                         bool isValid = (cache == "Enter" ||
                                         cache == "." ||
                                         cache == "-" ||
                                         cache == "Backspace" ||
+                                        cache == "Escape" ||
                                         (cache.Length == 1 && char.IsDigit(cache[0])));
                         
                         if (isValid)
@@ -250,6 +286,15 @@ namespace Matrix_Calculator
                                     Console.WriteLine($"Current Input after Backspace: '{tempData}'");
                                     UpdateMatrixDisplay();
                                 }
+                            } else if (cache == "Escape")
+                            {
+                                // Exit entering data
+                                tempData = "";
+                                tempRows = 0;
+                                tempCols = 0;
+                                globalState = State.Idle;
+                                ClearBoard();
+                                Console.WriteLine("Matrix input canceled");
                             }
                             else if (cache == "Enter")
                             {
@@ -329,6 +374,10 @@ namespace Matrix_Calculator
             }
         }
 
+        // ---------------------------------------------------------
+        // UI & Drawing Methods
+        // ---------------------------------------------------------
+
         private void DrawUI()
         {
             // Draw the buttons and other UI elements here
@@ -372,10 +421,14 @@ namespace Matrix_Calculator
                 DrawBrackets();
             }
 
+            // Add optional text
+            UpdateMessageText();
+
+
             if (!string.IsNullOrEmpty(tempData))
             {
                 Font font = SplashKit.GetSystemFont();
-                const int fontSize = 24;
+                const int fontSize = 20;
                 int textWidth = SplashKit.TextWidth(tempData, font, fontSize);
                 int textHeight = SplashKit.TextHeight(tempData, font, fontSize);
                 double x = _matrixEntryBox.X + (_matrixEntryBox.Width - textWidth) / 2;
@@ -384,6 +437,46 @@ namespace Matrix_Calculator
                 SplashKit.DrawText(tempData, Color.Black, font, fontSize, x, y);
             }
         }
+
+        private void UpdateMessageText()
+        {
+            Console.WriteLine($"Message Text: '{messageText}'");
+            Font font = SplashKit.GetSystemFont();
+            const int fontSize = 20;
+            int messageTextWidth = SplashKit.TextWidth(messageText, font, fontSize);
+            int messageTextHeight = SplashKit.TextHeight(messageText, font, fontSize);
+            SplashKit.DrawText(messageText, Color.Black, font, fontSize, _matrixEntryBox.X + (_matrixEntryBox.Width - messageTextWidth) / 2, _matrixEntryBox.Height * 0.5);
+        }
+
+        private void DrawBrackets()
+        {
+            int padding = 20;
+
+            // Draw Left Bits
+            SplashKit.DrawLine(Color.Black,
+                _matrixEntryBox.X + padding,    _matrixEntryBox.Y + padding,
+                _matrixEntryBox.X + 3*padding,  _matrixEntryBox.Y + padding);
+            SplashKit.DrawLine(Color.Black,
+                _matrixEntryBox.X + padding,    _matrixEntryBox.Y + _matrixEntryBox.Height - padding,
+                _matrixEntryBox.X + 3*padding,  _matrixEntryBox.Y + _matrixEntryBox.Height - padding);
+
+            // Draw Right Bits
+            SplashKit.DrawLine(Color.Black,
+                _matrixEntryBox.X + _matrixEntryBox.Width - padding,    _matrixEntryBox.Y + padding,
+                _matrixEntryBox.X + _matrixEntryBox.Width - 3*padding,  _matrixEntryBox.Y + padding);
+            SplashKit.DrawLine(Color.Black,
+                _matrixEntryBox.X + _matrixEntryBox.Width - padding,    _matrixEntryBox.Y + _matrixEntryBox.Height - padding,
+                _matrixEntryBox.X + _matrixEntryBox.Width - 3*padding,  _matrixEntryBox.Y + _matrixEntryBox.Height - padding);
+
+            // Draw Sides
+            SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + padding, _matrixEntryBox.Y + padding, _matrixEntryBox.X + padding, _matrixEntryBox.Y + _matrixEntryBox.Height - padding);
+            SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + _matrixEntryBox.Width - padding, _matrixEntryBox.Y + padding, _matrixEntryBox.X + _matrixEntryBox.Width - padding, _matrixEntryBox.Y + _matrixEntryBox.Height - padding);
+
+        }
+
+        // ---------------------------------------------------------
+        // Matrix & Board Management
+        // ---------------------------------------------------------
 
         private void DrawMatrix(int Rows, int Cols)
         {
@@ -420,7 +513,11 @@ namespace Matrix_Calculator
             Console.WriteLine("Matrix cleared");
         }
 
-        private string GetValidNum(string input)
+        // ---------------------------------------------------------
+        // Input Handling
+        // ---------------------------------------------------------
+
+        private string GetValidKey(string input)
         {
             if (string.IsNullOrEmpty(input)) return "";
 
@@ -446,32 +543,6 @@ namespace Matrix_Calculator
             if (input == "Return") return "Enter";
 
             return input;
-        }
-
-        private void DrawBrackets()
-        {
-            int padding = 20;
-
-            // Draw Left Bits
-            SplashKit.DrawLine(Color.Black,
-                _matrixEntryBox.X + padding,    _matrixEntryBox.Y + padding,
-                _matrixEntryBox.X + 3*padding,  _matrixEntryBox.Y + padding);
-            SplashKit.DrawLine(Color.Black,
-                _matrixEntryBox.X + padding,    _matrixEntryBox.Y + _matrixEntryBox.Height - padding,
-                _matrixEntryBox.X + 3*padding,  _matrixEntryBox.Y + _matrixEntryBox.Height - padding);
-
-            // Draw Right Bits
-            SplashKit.DrawLine(Color.Black,
-                _matrixEntryBox.X + _matrixEntryBox.Width - padding,    _matrixEntryBox.Y + padding,
-                _matrixEntryBox.X + _matrixEntryBox.Width - 3*padding,  _matrixEntryBox.Y + padding);
-            SplashKit.DrawLine(Color.Black,
-                _matrixEntryBox.X + _matrixEntryBox.Width - padding,    _matrixEntryBox.Y + _matrixEntryBox.Height - padding,
-                _matrixEntryBox.X + _matrixEntryBox.Width - 3*padding,  _matrixEntryBox.Y + _matrixEntryBox.Height - padding);
-
-            // Draw Sides
-            SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + padding, _matrixEntryBox.Y + padding, _matrixEntryBox.X + padding, _matrixEntryBox.Y + _matrixEntryBox.Height - padding);
-            SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + _matrixEntryBox.Width - padding, _matrixEntryBox.Y + padding, _matrixEntryBox.X + _matrixEntryBox.Width - padding, _matrixEntryBox.Y + _matrixEntryBox.Height - padding);
-
         }
     }
 }
