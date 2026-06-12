@@ -79,7 +79,7 @@ namespace Matrix_Calculator
             SplashKit.ClearScreen(Color.White);
             DrawUI();
             messageText = "Click to add matrix";
-            UpdateMessageText();
+            UpdateMessageText(); // First run
 
             // Main event loop
             while (!_window.CloseRequested)
@@ -136,6 +136,7 @@ namespace Matrix_Calculator
                     // Vars
                     Point2D mousePos = SplashKit.MousePosition();
 
+
                     // Matrix OnClicks Actions
                     if (SplashKit.MouseClicked(MouseButton.LeftButton))
                     {
@@ -171,6 +172,9 @@ namespace Matrix_Calculator
                         {
                             // Change state to entering matrix
                             globalState = State.EnteringDimensions; // Example for entering matrix A, can be changed based on user selection
+                            ClearBoard();
+                            messageText = "How many Rows?";
+                            UpdateMessageText();
                         }
                     }
                 }
@@ -209,11 +213,11 @@ namespace Matrix_Calculator
                             } else if (cache == "Escape")
                             {
                                 // Exit entering data
-                                tempData = "";
-                                tempRows = 0;
-                                tempCols = 0;
-                                globalState = State.Idle;
+                                ResetVars();
                                 ClearBoard();
+                                globalState = State.Idle;
+                                messageText = "Click to add matrix";
+                                UpdateMessageText();
                                 Console.WriteLine("Matrix input canceled");
                             } else if (cache == "Enter")
                             {
@@ -224,7 +228,7 @@ namespace Matrix_Calculator
                                         tempRows = int.Parse(tempData);
                                         Console.WriteLine($"Rows set to: {tempRows}");
                                         tempData = ""; // Reset tempData for next input
-                                        messageText += " columns";
+                                        messageText = "How many Columns?";
                                         UpdateMatrixDisplay();
                                     }
                                     else if (tempCols == 0)
@@ -240,8 +244,8 @@ namespace Matrix_Calculator
                             else
                             {
                                 tempData += cache; // Append valid key to tempData
-                                Console.WriteLine($"Current Input: '{tempData}'");
-                                UpdateMatrixDisplay();
+                                // Console.WriteLine($"Current Input: '{tempData}'");
+                                // UpdateMatrixDisplay();
                             }
                         }
                     }
@@ -256,7 +260,11 @@ namespace Matrix_Calculator
                 if (globalState == State.EnteringData)
                 {
                     // Prompt to enter values
-                    messageText = $"Enter value in cell ({currentCellY}, {currentCellX})";
+                    if (messageText != $"Enter value in cell ({currentCellY}, {currentCellX})")
+                    {
+                        messageText = $"Enter value in cell ({currentCellY}, {currentCellX})";
+                        UpdateMatrixDisplay();
+                    }
 
                     // Populate the Zero Matrix data
                     if (!string.IsNullOrEmpty(currentKey))
@@ -286,11 +294,11 @@ namespace Matrix_Calculator
                             } else if (cache == "Escape")
                             {
                                 // Exit entering data
-                                tempData = "";
-                                tempRows = 0;
-                                tempCols = 0;
-                                globalState = State.Idle;
+                                ResetVars();
                                 ClearBoard();
+                                globalState = State.Idle;
+                                messageText = "Click to add matrix";
+                                UpdateMessageText();
                                 Console.WriteLine("Matrix input canceled");
                             }
                             else if (cache == "Enter")
@@ -327,7 +335,10 @@ namespace Matrix_Calculator
                                             if (currentCellY >= tempMatrix.rows)
                                             {
                                                 Console.WriteLine("Matrix input complete");
+                                                ClearBoard();
                                                 globalState = State.Idle; // Move back to idle after filling the matrix
+                                                messageText = "Click to add matrix";
+                                                UpdateMessageText();
 
                                                 // Print the filled matrix for debugging
                                                 Console.WriteLine("Matrix contents:");
@@ -437,11 +448,12 @@ namespace Matrix_Calculator
 
         private void UpdateMessageText()
         {
+            // Write Meessage
             Console.WriteLine($"Message Text: '{messageText}'");
             Font font = SplashKit.GetSystemFont();
             const int fontSize = 20;
             int messageTextWidth = SplashKit.TextWidth(messageText, font, fontSize);
-            SplashKit.DrawText(messageText, Color.Black, font, fontSize, _matrixEntryBox.X + (_matrixEntryBox.Width - messageTextWidth) / 2, _matrixEntryBox.Height * 0.5);
+            SplashKit.DrawText(messageText, Color.Black, font, fontSize, _matrixEntryBox.X + (_matrixEntryBox.Width - messageTextWidth) / 2, _matrixEntryBox.Height / 2);
         }
 
         private void DrawBrackets()
@@ -494,6 +506,8 @@ namespace Matrix_Calculator
 
             // Update State
             globalState = State.EnteringData;
+            // messageText = "Enter values for matrix";
+            // UpdateMessageText();
         }
 
         private void ClearBoard()
@@ -501,12 +515,21 @@ namespace Matrix_Calculator
             // Clear the matrix entry box
             SplashKit.FillRectangle(Color.White, _matrixEntryBox);
             SplashKit.DrawRectangle(Color.Black, _matrixEntryBox);
-            // Reset matrix data
+            
+            // Reset
+            ResetVars();
+            Console.WriteLine("Matrix cleared");
+        }
+
+        private void ResetVars()
+        {
             tempMatrix = new MatrixData();
             tempRows = 0;
             tempCols = 0;
             tempData = "";
-            Console.WriteLine("Matrix cleared");
+            currentCellX = 0;
+            currentCellY = 0;
+            Console.WriteLine("Variables reset");
         }
 
         // ---------------------------------------------------------
