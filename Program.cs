@@ -334,21 +334,17 @@ namespace Matrix_Calculator
                                             currentCellY++; // Increment row
                                             if (currentCellY >= tempMatrix.rows)
                                             {
+                                                // Store the data
                                                 Console.WriteLine("Matrix input complete");
+                                                StoreMatrix(tempMatrix);
+
+                                                // Go back to Idle and reset
                                                 ClearBoard();
                                                 globalState = State.Idle; // Move back to idle after filling the matrix
                                                 messageText = "Click to add matrix";
                                                 UpdateMessageText();
 
                                                 // Print the filled matrix for debugging
-                                                Console.WriteLine("Matrix contents:");
-                                                for (int i = 0; i < tempMatrix.rows; i++)
-                                                {    for (int j = 0; j < tempMatrix.cols; j++)
-                                                    {
-                                                        Console.Write($"{tempMatrix.matrix[i, j]} ");
-                                                    }
-                                                    Console.WriteLine();
-                                                }
 
                                                 // // Draw the filled matrix on the screen
                                                 // ClearBoard();
@@ -562,6 +558,33 @@ namespace Matrix_Calculator
             if (input == "Return") return "Enter";
 
             return input;
+        }
+
+        // Store matrix
+        void StoreMatrix(MatrixData M)
+        {
+            // // Print rows and cols
+            // Console.WriteLine($"Rows: {M.rows}");
+            // Console.WriteLine($"Cols: {M.cols}");
+
+            
+            Console.WriteLine("Matrix contents:");
+
+            PrintMatrix(M);
+        }
+
+        void PrintMatrix(MatrixData M)
+        {
+            // Print each value
+            for (int i = 0; i < M.rows; i++)
+            {
+                for (int j = 0; j < M.cols; j++)
+                {
+                    // Console.WriteLine($"{i}, {j}, {M.matrix[i, j]}");
+                    Console.Write($"{M.matrix[i, j]}, ");
+                }
+                Console.WriteLine();
+            }
         }
     }
 }
