@@ -23,6 +23,11 @@ namespace Matrix_Calculator
         private Rectangle _multiplyButton;
         private Rectangle _transposeButton;
         private Rectangle _inverseButton;
+        private Rectangle _determinantButton;
+        private Rectangle bottom1Button;
+        private Rectangle bottom2Button;
+        private Rectangle bottom3Button;
+        private Rectangle bottom4Button;
 
         // Var for entering data into matrix
         private Rectangle _matrixEntryBox;
@@ -56,21 +61,32 @@ namespace Matrix_Calculator
             program.Run();
         }
 
-        // Constructor
+        // Program
         public Program()
         {
-            // Initialize the window and buttons
-            _window = new Window("Matrix Calculator", 800, 600);
-            _addButton        = SplashKit.RectangleFrom(50, 50, 100, 50);
-            _subtractButton   = SplashKit.RectangleFrom(200, 50, 100, 50);
-            _multiplyButton   = SplashKit.RectangleFrom(350, 50, 100, 50);
-            _transposeButton  = SplashKit.RectangleFrom(500, 50, 100, 50);
-            _inverseButton    = SplashKit.RectangleFrom(650, 50, 100, 50);
-            _matrixEntryBox   = SplashKit.RectangleFrom(50, 150, 700, 400);
+            // Initialize window
+            _window             = new Window("Matrix Calculator", 740, 600);
+
+            // Initialize top buttons
+            _addButton          = SplashKit.RectangleFrom(20, 20, 100, 60);
+            _subtractButton     = SplashKit.RectangleFrom(140, 20, 100, 60);
+            _multiplyButton     = SplashKit.RectangleFrom(260, 20, 100, 60);
+            _transposeButton    = SplashKit.RectangleFrom(380, 20, 100, 60);
+            _inverseButton      = SplashKit.RectangleFrom(500, 20, 100, 60);
+            _determinantButton  = SplashKit.RectangleFrom(620, 20, 100, 60);
+
+            // Initialize matrix box
+            _matrixEntryBox     = SplashKit.RectangleFrom(20, 100, 700, 400);
+
+            // Initialize bottom buttons
+            bottom1Button       = SplashKit.RectangleFrom(20, 520, 160, 60);
+            bottom2Button       = SplashKit.RectangleFrom(200, 520, 160, 60);
+            bottom3Button       = SplashKit.RectangleFrom(380, 520, 160, 60);
+            bottom4Button       = SplashKit.RectangleFrom(560, 520, 160, 60);
         }
 
         // ---------------------------------------------------------
-        // Main Loop
+        // Core Execution Loop
         // ---------------------------------------------------------
 
         public void Run()
@@ -79,7 +95,7 @@ namespace Matrix_Calculator
             SplashKit.ClearScreen(Color.White);
             DrawUI();
             messageText = "Click to add matrix";
-            UpdateMessageText(); // First run
+            UpdateMessageText(messageText); // First run
 
             // Main event loop
             while (!_window.CloseRequested)
@@ -136,7 +152,6 @@ namespace Matrix_Calculator
                     // Vars
                     Point2D mousePos = SplashKit.MousePosition();
 
-
                     // Matrix OnClicks Actions
                     if (SplashKit.MouseClicked(MouseButton.LeftButton))
                     {
@@ -166,6 +181,31 @@ namespace Matrix_Calculator
                             // Handle inverse
                             Console.WriteLine("Button Clicked: Inverse");
                         }
+                        else if (SplashKit.PointInRectangle(mousePos, _determinantButton))
+                        {
+                            // Handle determinant
+                            Console.WriteLine("Button Clicked: Determinant");
+                        }
+                        else if (SplashKit.PointInRectangle(mousePos, bottom1Button))
+                        {
+                            // Handle Bottom 1
+                            Console.WriteLine("Button Clicked: Bottom 1");
+                        }
+                        else if (SplashKit.PointInRectangle(mousePos, bottom2Button))
+                        {
+                            // Handle Bottom 2
+                            Console.WriteLine("Button Clicked: Bottom 2");
+                        }
+                        else if (SplashKit.PointInRectangle(mousePos, bottom3Button))
+                        {
+                            // Handle Bottom 3
+                            Console.WriteLine("Button Clicked: Bottom 3");
+                        }
+                        else if (SplashKit.PointInRectangle(mousePos, bottom4Button))
+                        {
+                            // Handle Bottom 4
+                            Console.WriteLine("Button Clicked: Bottom 4");
+                        }
 
                         // Adding Matrices OnClick
                         if (SplashKit.PointInRectangle(mousePos, _matrixEntryBox))
@@ -174,7 +214,7 @@ namespace Matrix_Calculator
                             globalState = State.EnteringDimensions; // Example for entering matrix A, can be changed based on user selection
                             ClearBoard();
                             messageText = "How many Rows?";
-                            UpdateMessageText();
+                            UpdateMessageText(messageText);
                         }
                     }
                 }
@@ -217,7 +257,7 @@ namespace Matrix_Calculator
                                 ClearBoard();
                                 globalState = State.Idle;
                                 messageText = "Click to add matrix";
-                                UpdateMessageText();
+                                UpdateMessageText(messageText);
                                 Console.WriteLine("Matrix input canceled");
                             } else if (cache == "Enter")
                             {
@@ -298,7 +338,7 @@ namespace Matrix_Calculator
                                 ClearBoard();
                                 globalState = State.Idle;
                                 messageText = "Click to add matrix";
-                                UpdateMessageText();
+                                UpdateMessageText(messageText);
                                 Console.WriteLine("Matrix input canceled");
                             }
                             else if (cache == "Enter")
@@ -342,7 +382,7 @@ namespace Matrix_Calculator
                                                 ClearBoard();
                                                 globalState = State.Idle; // Move back to idle after filling the matrix
                                                 messageText = "Click to add matrix";
-                                                UpdateMessageText();
+                                                UpdateMessageText(messageText);
 
                                                 // Print the filled matrix for debugging
 
@@ -379,21 +419,28 @@ namespace Matrix_Calculator
         }
 
         // ---------------------------------------------------------
-        // UI & Drawing Methods
+        // UI & Visual Rendering
         // ---------------------------------------------------------
 
         private void DrawUI()
         {
-            // Draw the buttons and other UI elements here
+            // Draw the top buttons
             DrawButton(_addButton, "Add");
             DrawButton(_subtractButton, "Subtract");
             DrawButton(_multiplyButton, "Multiply");
             DrawButton(_transposeButton, "Transpose");
             DrawButton(_inverseButton, "Inverse");
+            DrawButton(_determinantButton, "Determinant");
             
             // Draw Matrix entry box
             SplashKit.FillRectangle(Color.White, _matrixEntryBox);
             SplashKit.DrawRectangle(Color.Black, _matrixEntryBox);
+
+            // Draw the bottom buttons
+            DrawButton(bottom1Button, "Copy Equation");
+            DrawButton(bottom2Button, "Paste Equation");
+            DrawButton(bottom3Button, "Copy Result");
+            DrawButton(bottom4Button, "Paste Result");
         }
 
         private void DrawButton(Rectangle rect, string text)
@@ -426,7 +473,7 @@ namespace Matrix_Calculator
             }
 
             // Add optional text
-            UpdateMessageText();
+            UpdateMessageText(messageText);
 
 
             if (!string.IsNullOrEmpty(tempData))
@@ -442,14 +489,14 @@ namespace Matrix_Calculator
             }
         }
 
-        private void UpdateMessageText()
+        private void UpdateMessageText(string t)
         {
             // Write Meessage
-            Console.WriteLine($"Message Text: '{messageText}'");
+            Console.WriteLine($"Message Text: '{tempData}'");
             Font font = SplashKit.GetSystemFont();
             const int fontSize = 20;
-            int messageTextWidth = SplashKit.TextWidth(messageText, font, fontSize);
-            SplashKit.DrawText(messageText, Color.Black, font, fontSize, _matrixEntryBox.X + (_matrixEntryBox.Width - messageTextWidth) / 2, _matrixEntryBox.Height / 2);
+            int messageTextWidth = SplashKit.TextWidth(t, font, fontSize);
+            SplashKit.DrawText(t, Color.Black, font, fontSize, _matrixEntryBox.X + (_matrixEntryBox.Width - messageTextWidth) / 2, _matrixEntryBox.Height / 2);
         }
 
         private void DrawBrackets()
@@ -479,7 +526,7 @@ namespace Matrix_Calculator
         }
 
         // ---------------------------------------------------------
-        // Matrix & Board Management
+        // State & Board Management
         // ---------------------------------------------------------
 
         private void DrawMatrix(int Rows, int Cols)
@@ -503,7 +550,7 @@ namespace Matrix_Calculator
             // Update State
             globalState = State.EnteringData;
             // messageText = "Enter values for matrix";
-            // UpdateMessageText();
+            // UpdateMessageText(messageText);
         }
 
         private void ClearBoard()
@@ -529,7 +576,7 @@ namespace Matrix_Calculator
         }
 
         // ---------------------------------------------------------
-        // Input Handling
+        // Input & Validation
         // ---------------------------------------------------------
 
         private string GetValidKey(string input)
@@ -560,6 +607,10 @@ namespace Matrix_Calculator
             return input;
         }
 
+        // ---------------------------------------------------------
+        // Matrix Data Operations & Debugging
+        // ---------------------------------------------------------
+
         // Store matrix
         void StoreMatrix(MatrixData M)
         {
@@ -567,7 +618,6 @@ namespace Matrix_Calculator
             // Console.WriteLine($"Rows: {M.rows}");
             // Console.WriteLine($"Cols: {M.cols}");
 
-            
             Console.WriteLine("Matrix contents:");
 
             PrintMatrix(M);
