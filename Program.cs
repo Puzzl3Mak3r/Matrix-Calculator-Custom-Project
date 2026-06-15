@@ -29,6 +29,7 @@ namespace Matrix_Calculator
         string tempData = ""; // MultiPurpose string to store user input
         MatrixData tempMatrix;
         string currentKey = ""; // To store the user input
+        bool matricesShown = false;
         
         
         // ---------------------------------------------------------
@@ -199,6 +200,20 @@ namespace Matrix_Calculator
 
                 if (globalState == State.Idle )
                 {
+                    // Draw Matrix(s) if existing
+                    if (_matrices[1].matrix != null && !matricesShown)
+                    {
+                        // Display first matrix on left, second matrix on right
+                        DisplayMatrix(_matrices[0], 10, 150, 370, 360);
+                        DisplayMatrix(_matrices[1], 360, 150, 370, 360);
+                        matricesShown = true;
+                    } else if (_matrices[0].matrix != null && !matricesShown)
+                    {
+                        // Display first matrix in center
+                        DisplayMatrix(_matrices[0], 185, 150, 370, 360);
+                        matricesShown = true;
+                    }
+
                     // Matrix OnClicks Actions (Uses the same mousePos)
                     if (SplashKit.MouseClicked(MouseButton.LeftButton))
                     {
@@ -208,6 +223,7 @@ namespace Matrix_Calculator
                         {
                             // Change state to entering matrix
                             Reset();
+                            matricesShown = false;
                             globalState = State.EnteringDimensions; // Example for entering matrix A, can be changed based on user selection
                             messageText = "How many Rows? (Esc to exit)";
                             _renderVisuals.UpdateMessageText(messageText);
@@ -499,6 +515,10 @@ namespace Matrix_Calculator
         void DisplayMatrix(MatrixData M, int x, int y, int w, int h)
         {
             Console.WriteLine($"Displaying matrix with dimensions: {M.rows} x {M.cols}");
+
+            // Add Brackets
+            _renderVisuals.DrawBrackets((double)x, (double)y, (double)w, (double)h);
+
 
             // Iterate through the values
             for (int i = 0; i < M.rows; i++)

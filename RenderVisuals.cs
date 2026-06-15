@@ -89,7 +89,7 @@ namespace Matrix_Calculator
             if (isEnteringData)
             {
                 // Draw the Square Brackets
-                DrawBrackets();
+                DrawBrackets(MatrixEntryBox.X, MatrixEntryBox.Y, MatrixEntryBox.Width, MatrixEntryBox.Height);
             }
 
             // Add optional text
@@ -103,7 +103,6 @@ namespace Matrix_Calculator
                 int textHeight = SplashKit.TextHeight(tempData, font, fontSize);
                 double x = MatrixEntryBox.X + (MatrixEntryBox.Width - textWidth) / 2;
                 double y = MatrixEntryBox.Y + (MatrixEntryBox.Height - textHeight) / 2;
-
                 SplashKit.DrawText(tempData, Color.Black, font, fontSize, x, y);
             }
         }
@@ -115,30 +114,30 @@ namespace Matrix_Calculator
             Font font = SplashKit.GetSystemFont();
             const int fontSize = 20;
             int messageTextWidth = SplashKit.TextWidth(t, font, fontSize);
-            SplashKit.DrawText(t, Color.Black, font, fontSize, MatrixEntryBox.X + (MatrixEntryBox.Width - messageTextWidth) / 2, MatrixEntryBox.Height / 2);
+            SplashKit.DrawText(t, Color.Black, font, fontSize, MatrixEntryBox.X + (MatrixEntryBox.Width - messageTextWidth) / 2, (MatrixEntryBox.Height / 2) - 80); // Got to make it higher to be out of the way of matrices
         }
 
-        public void DrawBrackets()
+        public void DrawBrackets(double x, double y, double w, double h)
         {
             // Draw Left Bits
             SplashKit.DrawLine(Color.Black,
-                MatrixEntryBox.X + padding,    MatrixEntryBox.Y + padding,
-                MatrixEntryBox.X + 3*padding,  MatrixEntryBox.Y + padding);
+                x + padding,    y + padding,
+                x + 3*padding,  y + padding);
             SplashKit.DrawLine(Color.Black,
-                MatrixEntryBox.X + padding,    MatrixEntryBox.Y + MatrixEntryBox.Height - padding,
-                MatrixEntryBox.X + 3*padding,  MatrixEntryBox.Y + MatrixEntryBox.Height - padding);
+                x + padding,    y + h - padding,
+                x + 3*padding,  y + h - padding);
 
             // Draw Right Bits
             SplashKit.DrawLine(Color.Black,
-                MatrixEntryBox.X + MatrixEntryBox.Width - padding,    MatrixEntryBox.Y + padding,
-                MatrixEntryBox.X + MatrixEntryBox.Width - 3*padding,  MatrixEntryBox.Y + padding);
+                x + w - padding,    y + padding,
+                x + w - 3*padding,  y + padding);
             SplashKit.DrawLine(Color.Black,
-                MatrixEntryBox.X + MatrixEntryBox.Width - padding,    MatrixEntryBox.Y + MatrixEntryBox.Height - padding,
-                MatrixEntryBox.X + MatrixEntryBox.Width - 3*padding,  MatrixEntryBox.Y + MatrixEntryBox.Height - padding);
+                x + w - padding,    y + h - padding,
+                x + w - 3*padding,  y + h - padding);
 
             // Draw Sides
-            SplashKit.DrawLine(Color.Black, MatrixEntryBox.X + padding, MatrixEntryBox.Y + padding, MatrixEntryBox.X + padding, MatrixEntryBox.Y + MatrixEntryBox.Height - padding);
-            SplashKit.DrawLine(Color.Black, MatrixEntryBox.X + MatrixEntryBox.Width - padding, MatrixEntryBox.Y + padding, MatrixEntryBox.X + MatrixEntryBox.Width - padding, MatrixEntryBox.Y + MatrixEntryBox.Height - padding);
+            SplashKit.DrawLine(Color.Black, x + padding, y + padding, x + padding, y + h - padding);
+            SplashKit.DrawLine(Color.Black, x + w - padding, y + padding, x + w - padding, y + h - padding);
         }
 
         public void DrawMatrix(int Rows, int Cols)
@@ -150,7 +149,7 @@ namespace Matrix_Calculator
             SplashKit.DrawRectangle(Color.Black, MatrixEntryBox);
 
             // Draw the Square Brackets
-            DrawBrackets();
+            DrawBrackets(MatrixEntryBox.X, MatrixEntryBox.Y, MatrixEntryBox.Width, MatrixEntryBox.Height);
         }
 
         public void ClearBoard()
