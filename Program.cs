@@ -3,6 +3,7 @@ using SplashKitSDK;
 
 namespace Matrix_Calculator
 {
+    // Matrix Enum
     public struct MatrixData
     {
         public int rows; // rows
@@ -13,33 +14,25 @@ namespace Matrix_Calculator
     public class Program
     {
         // ---------------------------------------------------------
-        // Variables & State
-        // ---------------------------------------------------------
-
-        // Variables for GUI
+        //  Window and Object Variables
         private Window _window;
-        private Rectangle _addButton;
-        private Rectangle _subtractButton;
-        private Rectangle _multiplyButton;
-        private Rectangle _transposeButton;
-        private Rectangle _inverseButton;
-        private Rectangle _determinantButton;
-        private Rectangle bottom1Button;
-        private Rectangle bottom2Button;
-        private Rectangle bottom3Button;
-        private Rectangle bottom4Button;
+        private RenderVisuals _renderVisuals;
+        private MatrixMemento _matrixMemento;
+        private Operation _matrixOperation;
 
-        // Var for entering data into matrix
-        private Rectangle _matrixEntryBox;
+        // ---------------------------------------------------------
+        // Temporary Variables
+        // They change a lot and handle carry data across the program
         int tempRows = 0;
         int tempCols = 0;
-        int currentCellX = 0;
-        int currentCellY = 0;
-        string messageText = "Click to add Matrix";
+        string messageText = "Click to add Matrix"; // Initial message
         string tempData = ""; // MultiPurpose string to store user input
         MatrixData tempMatrix;
         string currentKey = ""; // To store the user input
-        // State Machine (to handle whats currently happening)
+        
+        
+        // ---------------------------------------------------------
+        // States
         enum State
         {
             Idle,
@@ -49,6 +42,14 @@ namespace Matrix_Calculator
         };
         State globalState = State.Idle;
         State previousState = State.Idle;
+
+        // ---------------------------------------------------------
+        // Matrix
+        private MatrixData[] _matrices = new MatrixData[3]; // Stores Matrix A, B, and Result
+        int currentCellX = 0;
+        int currentCellY = 0;
+
+
 
         // ---------------------------------------------------------
         // Initialization
@@ -66,24 +67,10 @@ namespace Matrix_Calculator
         {
             // Initialize window
             _window             = new Window("Matrix Calculator", 740, 600);
-
-            // Initialize top buttons
-            _addButton          = SplashKit.RectangleFrom(20, 20, 100, 60);
-            _subtractButton     = SplashKit.RectangleFrom(140, 20, 100, 60);
-            _multiplyButton     = SplashKit.RectangleFrom(260, 20, 100, 60);
-            _transposeButton    = SplashKit.RectangleFrom(380, 20, 100, 60);
-            _inverseButton      = SplashKit.RectangleFrom(500, 20, 100, 60);
-            _determinantButton  = SplashKit.RectangleFrom(620, 20, 100, 60);
-
-            // Initialize matrix box
-            _matrixEntryBox     = SplashKit.RectangleFrom(20, 100, 700, 400);
-
-            // Initialize bottom buttons
-            bottom1Button       = SplashKit.RectangleFrom(20, 520, 160, 60);
-            bottom2Button       = SplashKit.RectangleFrom(200, 520, 160, 60);
-            bottom3Button       = SplashKit.RectangleFrom(380, 520, 160, 60);
-            bottom4Button       = SplashKit.RectangleFrom(560, 520, 160, 60);
+            _renderVisuals      = new RenderVisuals();
         }
+
+
 
         // ---------------------------------------------------------
         // Core Execution Loop
@@ -93,9 +80,9 @@ namespace Matrix_Calculator
         {
             // Clear screen to prevent ghosting
             SplashKit.ClearScreen(Color.White);
-            DrawUI();
+            _renderVisuals.DrawUI();
             messageText = "Click to add matrix";
-            UpdateMessageText(messageText); // First run
+            _renderVisuals.UpdateMessageText(messageText); // First run
 
             // Main event loop
             while (!_window.CloseRequested)
@@ -144,77 +131,86 @@ namespace Matrix_Calculator
 
 
                 // ---------------------------------------------------------
+                // Buttons Handler
+                // ---------------------------------------------------------
+
+                // Vars
+                Point2D mousePos = SplashKit.MousePosition();
+
+                if (SplashKit.MouseClicked(MouseButton.LeftButton))
+                {
+                    if (SplashKit.PointInRectangle(mousePos, _renderVisuals.AddButton))
+                    {
+                        // Handle addition
+                        Console.WriteLine("Button Clicked: Add");
+                    }
+                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.SubtractButton))
+                    {
+                        // Handle subtraction
+                        Console.WriteLine("Button Clicked: Subtract");
+                    }
+                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.MultiplyButton))
+                    {
+                        // Handle multiplication
+                        Console.WriteLine("Button Clicked: Multiply");
+                    }
+                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.TransposeButton))
+                    {
+                        // Handle transpose
+                        Console.WriteLine("Button Clicked: Transpose");
+                    }
+                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.InverseButton))
+                    {
+                        // Handle inverse
+                        Console.WriteLine("Button Clicked: Inverse");
+                    }
+                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.DeterminantButton))
+                    {
+                        // Handle determinant
+                        Console.WriteLine("Button Clicked: Determinant");
+                    }
+                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom1Button))
+                    {
+                        // Handle Bottom 1
+                        Console.WriteLine("Button Clicked: Bottom 1");
+                    }
+                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom2Button))
+                    {
+                        // Handle Bottom 2
+                        Console.WriteLine("Button Clicked: Bottom 2");
+                    }
+                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom3Button))
+                    {
+                        // Handle Bottom 3
+                        Console.WriteLine("Button Clicked: Bottom 3");
+                    }
+                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom4Button))
+                    {
+                        // Handle Bottom 4
+                        Console.WriteLine("Button Clicked: Bottom 4");
+                    }
+                }
+
+
+
+                // ---------------------------------------------------------
                 // State: Idle
                 // ---------------------------------------------------------
 
                 if (globalState == State.Idle )
                 {
-                    // Vars
-                    Point2D mousePos = SplashKit.MousePosition();
-
-                    // Matrix OnClicks Actions
+                    // Matrix OnClicks Actions (Uses the same mousePos)
                     if (SplashKit.MouseClicked(MouseButton.LeftButton))
                     {
-                        // Operation Actions
-                        if (SplashKit.PointInRectangle(mousePos, _addButton))
-                        {
-                            // Handle addition
-                            Console.WriteLine("Button Clicked: Add");
-                        }
-                        else if (SplashKit.PointInRectangle(mousePos, _subtractButton))
-                        {
-                            // Handle subtraction
-                            Console.WriteLine("Button Clicked: Subtract");
-                        }
-                        else if (SplashKit.PointInRectangle(mousePos, _multiplyButton))
-                        {
-                            // Handle multiplication
-                            Console.WriteLine("Button Clicked: Multiply");
-                        }
-                        else if (SplashKit.PointInRectangle(mousePos, _transposeButton))
-                        {
-                            // Handle transpose
-                            Console.WriteLine("Button Clicked: Transpose");
-                        }
-                        else if (SplashKit.PointInRectangle(mousePos, _inverseButton))
-                        {
-                            // Handle inverse
-                            Console.WriteLine("Button Clicked: Inverse");
-                        }
-                        else if (SplashKit.PointInRectangle(mousePos, _determinantButton))
-                        {
-                            // Handle determinant
-                            Console.WriteLine("Button Clicked: Determinant");
-                        }
-                        else if (SplashKit.PointInRectangle(mousePos, bottom1Button))
-                        {
-                            // Handle Bottom 1
-                            Console.WriteLine("Button Clicked: Bottom 1");
-                        }
-                        else if (SplashKit.PointInRectangle(mousePos, bottom2Button))
-                        {
-                            // Handle Bottom 2
-                            Console.WriteLine("Button Clicked: Bottom 2");
-                        }
-                        else if (SplashKit.PointInRectangle(mousePos, bottom3Button))
-                        {
-                            // Handle Bottom 3
-                            Console.WriteLine("Button Clicked: Bottom 3");
-                        }
-                        else if (SplashKit.PointInRectangle(mousePos, bottom4Button))
-                        {
-                            // Handle Bottom 4
-                            Console.WriteLine("Button Clicked: Bottom 4");
-                        }
 
                         // Adding Matrices OnClick
-                        if (SplashKit.PointInRectangle(mousePos, _matrixEntryBox))
+                        if (SplashKit.PointInRectangle(mousePos, _renderVisuals.MatrixEntryBox))
                         {
                             // Change state to entering matrix
+                            Reset();
                             globalState = State.EnteringDimensions; // Example for entering matrix A, can be changed based on user selection
-                            ClearBoard();
-                            messageText = "How many Rows?";
-                            UpdateMessageText(messageText);
+                            messageText = "How many Rows? (Esc to exit)";
+                            _renderVisuals.UpdateMessageText(messageText);
                         }
                     }
                 }
@@ -248,44 +244,49 @@ namespace Matrix_Calculator
                                 {
                                     tempData = tempData.Substring(0, tempData.Length - 1); // Remove last character
                                     Console.WriteLine($"Current Input after Backspace: '{tempData}'");
-                                    UpdateMatrixDisplay();
+                                    _renderVisuals.UpdateMatrixDisplay(globalState == State.EnteringData, messageText, tempData);
                                 }
                             } else if (cache == "Escape")
                             {
                                 // Exit entering data
-                                ResetVars();
-                                ClearBoard();
-                                globalState = State.Idle;
+                                Reset();
                                 messageText = "Click to add matrix";
-                                UpdateMessageText(messageText);
+                                _renderVisuals.UpdateMessageText(messageText);
                                 Console.WriteLine("Matrix input canceled");
                             } else if (cache == "Enter")
                             {
-                                if (tempData.Length > 0)
+                                if (tempData.Length > 0 && int.TryParse(tempData, out int parsedValue))
                                 {
                                     if (tempRows == 0)
                                     {
-                                        tempRows = int.Parse(tempData);
+                                        tempRows = parsedValue;
                                         Console.WriteLine($"Rows set to: {tempRows}");
                                         tempData = ""; // Reset tempData for next input
-                                        messageText = "How many Columns?";
-                                        UpdateMatrixDisplay();
+                                        messageText = "How many Columns? (Esc to exit)";
+                                        _renderVisuals.UpdateMatrixDisplay(globalState == State.EnteringData, messageText, tempData);
                                     }
                                     else if (tempCols == 0)
                                     {
-                                        tempCols = int.Parse(tempData);
+                                        tempCols = parsedValue;
                                         Console.WriteLine($"Columns set to: {tempCols}");
                                         tempData = ""; // Reset tempData for next input
                                         messageText = "";
-                                        DrawMatrix(tempRows, tempCols); // This also changes State
+                                        _renderVisuals.DrawMatrix(tempRows, tempCols);
+                                        tempMatrix = MatrixFactory.CreateZMatrix(tempRows, tempCols);
+                                        Console.WriteLine($"Matrix created with dimensions: {tempMatrix.rows} x {tempMatrix.cols}");
+                                        globalState = State.EnteringData;
                                     }
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Invalid input: '{tempData}' is not a valid integer.");
                                 }
                             }
                             else
                             {
                                 tempData += cache; // Append valid key to tempData
-                                // Console.WriteLine($"Current Input: '{tempData}'");
-                                // UpdateMatrixDisplay();
+                                Console.WriteLine($"Current Input: '{tempData}'");
+                                _renderVisuals.UpdateMatrixDisplay(globalState == State.EnteringData, messageText, tempData);
                             }
                         }
                     }
@@ -300,10 +301,10 @@ namespace Matrix_Calculator
                 if (globalState == State.EnteringData)
                 {
                     // Prompt to enter values
-                    if (messageText != $"Enter value in cell ({currentCellY}, {currentCellX})")
+                    if (messageText != $"Enter value in cell ({currentCellY+1}, {currentCellX+1}) (Esc to exit)")
                     {
-                        messageText = $"Enter value in cell ({currentCellY}, {currentCellX})";
-                        UpdateMatrixDisplay();
+                        messageText = $"Enter value in cell ({currentCellY+1}, {currentCellX+1}) (Esc to exit)";
+                        _renderVisuals.UpdateMatrixDisplay(globalState == State.EnteringData, messageText, tempData);
                     }
 
                     // Populate the Zero Matrix data
@@ -329,43 +330,29 @@ namespace Matrix_Calculator
                                 {
                                     tempData = tempData.Substring(0, tempData.Length - 1); // Remove last character
                                     Console.WriteLine($"Current Input after Backspace: '{tempData}'");
-                                    UpdateMatrixDisplay();
+                                    _renderVisuals.UpdateMatrixDisplay(globalState == State.EnteringData, messageText, tempData);
                                 }
                             } else if (cache == "Escape")
                             {
                                 // Exit entering data
-                                ResetVars();
-                                ClearBoard();
-                                globalState = State.Idle;
+                                Reset();
                                 messageText = "Click to add matrix";
-                                UpdateMessageText(messageText);
+                                _renderVisuals.UpdateMessageText(messageText);
                                 Console.WriteLine("Matrix input canceled");
                             }
                             else if (cache == "Enter")
                             {
-                                // Check if multiple decimal points or minus signs are being entered, if so ignore the input
-                                if (cache == "." && tempData.Contains("."))
+                                if (tempData.Length == 0 || tempData == "-" || tempData == ".")
                                 {
-                                    Console.WriteLine("Invalid input: Multiple decimal points");
-                                } else if (cache == "-" && tempData.Contains("-"))
-                                {
-                                    Console.WriteLine("Invalid input: Multiple minus signs");
-                                }
-                                else if (cache == "-" && tempData.Length > 0)
-                                {
-                                    Console.WriteLine("Invalid input: Minus sign can only be at the beginning");
-                                }
-                                else if (tempData.Length == 0)
-                                {
-                                    Console.WriteLine("Invalid input: No number entered");
+                                    Console.WriteLine("Invalid input: No valid number entered");
                                 }
                                 else
                                 {
-                                    if (tempData.Length > 0)
+                                    if (tempData.Length > 0 && double.TryParse(tempData, out double parsedValue))
                                     {
                                         // Fill that data in Matrix cell (tempRows, currentCellX)
-                                        Console.WriteLine($"Placing value '{tempData}' in cell ({currentCellY}, {currentCellX})");
-                                        tempMatrix.matrix[currentCellY, currentCellX] = double.Parse(tempData);
+                                        Console.WriteLine($"Placing value '{parsedValue}' in cell ({currentCellY}, {currentCellX})");
+                                        tempMatrix.matrix[currentCellY, currentCellX] = parsedValue;
                                         tempData = ""; // Reset tempData for next input
                                         currentCellX++; // Increment column
                                         if (currentCellX >= tempMatrix.cols)
@@ -379,35 +366,38 @@ namespace Matrix_Calculator
                                                 StoreMatrix(tempMatrix);
 
                                                 // Go back to Idle and reset
-                                                ClearBoard();
-                                                globalState = State.Idle; // Move back to idle after filling the matrix
+                                                Reset();
                                                 messageText = "Click to add matrix";
-                                                UpdateMessageText(messageText);
-
-                                                // Print the filled matrix for debugging
-
-                                                // // Draw the filled matrix on the screen
-                                                // ClearBoard();
-                                                // for (int i = 0; i < tempMatrix.rows; i++)
-                                                // {
-                                                //     for (int j = 0; j < tempMatrix.cols; j++)
-                                                //     {
-                                                //         // Draw here
-                                                //     }
-                                                // }
+                                                _renderVisuals.UpdateMessageText(messageText);
                                             }
                                         }
-                                        UpdateMatrixDisplay();
+                                        _renderVisuals.UpdateMatrixDisplay(globalState == State.EnteringData, messageText, tempData);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"Invalid input: '{tempData}' is not a valid number.");
                                     }
                                 }
                             }
                             else
                             {
-                                tempData += cache; // Append valid key to tempData
-                                Console.WriteLine($"Current Input: '{tempData}'");
+                                // Guardrails for decimal points and minus signs
+                                if (cache == "." && tempData.Contains("."))
+                                {
+                                    Console.WriteLine("Invalid input: Multiple decimal points");
+                                }
+                                else if (cache == "-" && tempData.Length > 0)
+                                {
+                                    Console.WriteLine("Invalid input: Minus sign can only be at the beginning");
+                                }
+                                else
+                                {
+                                    tempData += cache; // Append valid key to tempData
+                                    Console.WriteLine($"Current Input: '{tempData}'");
 
-                                // Draw the current input
-                                UpdateMatrixDisplay();
+                                    // Draw the current input
+                                    _renderVisuals.UpdateMatrixDisplay(globalState == State.EnteringData, messageText, tempData);
+                                }
                             }
                         }
                     }
@@ -419,153 +409,13 @@ namespace Matrix_Calculator
         }
 
         // ---------------------------------------------------------
-        // UI & Visual Rendering
-        // ---------------------------------------------------------
-
-        private void DrawUI()
-        {
-            // Draw the top buttons
-            DrawButton(_addButton, "Add");
-            DrawButton(_subtractButton, "Subtract");
-            DrawButton(_multiplyButton, "Multiply");
-            DrawButton(_transposeButton, "Transpose");
-            DrawButton(_inverseButton, "Inverse");
-            DrawButton(_determinantButton, "Determinant");
-            
-            // Draw Matrix entry box
-            SplashKit.FillRectangle(Color.White, _matrixEntryBox);
-            SplashKit.DrawRectangle(Color.Black, _matrixEntryBox);
-
-            // Draw the bottom buttons
-            DrawButton(bottom1Button, "Copy Equation");
-            DrawButton(bottom2Button, "Paste Equation");
-            DrawButton(bottom3Button, "Copy Result");
-            DrawButton(bottom4Button, "Paste Result");
-        }
-
-        private void DrawButton(Rectangle rect, string text)
-        {
-            // Fill button background and draw a border
-            SplashKit.FillRectangle(Color.LightGray, rect);
-            SplashKit.DrawRectangle(Color.Black, rect);
-
-            // Center the text inside the button
-            Font font = SplashKit.GetSystemFont();
-            const int fontSize = 14;
-            int textWidth = SplashKit.TextWidth(text, font, fontSize);
-            int textHeight = SplashKit.TextHeight(text, font, fontSize);
-            double x = rect.X + (rect.Width - textWidth) / 2;
-            double y = rect.Y + (rect.Height - textHeight) / 2;
-
-            SplashKit.DrawText(text, Color.Black, font, fontSize, x, y);
-        }
-
-        private void UpdateMatrixDisplay()
-        {
-            // Clear the matrix entry box
-            SplashKit.FillRectangle(Color.White, _matrixEntryBox);
-            SplashKit.DrawRectangle(Color.Black, _matrixEntryBox);
-
-            if (globalState == State.EnteringData)
-            {
-                // Draw the Square Brackets
-                DrawBrackets();
-            }
-
-            // Add optional text
-            UpdateMessageText(messageText);
-
-
-            if (!string.IsNullOrEmpty(tempData))
-            {
-                Font font = SplashKit.GetSystemFont();
-                const int fontSize = 20;
-                int textWidth = SplashKit.TextWidth(tempData, font, fontSize);
-                int textHeight = SplashKit.TextHeight(tempData, font, fontSize);
-                double x = _matrixEntryBox.X + (_matrixEntryBox.Width - textWidth) / 2;
-                double y = _matrixEntryBox.Y + (_matrixEntryBox.Height - textHeight) / 2;
-
-                SplashKit.DrawText(tempData, Color.Black, font, fontSize, x, y);
-            }
-        }
-
-        private void UpdateMessageText(string t)
-        {
-            // Write Meessage
-            Console.WriteLine($"Message Text: '{tempData}'");
-            Font font = SplashKit.GetSystemFont();
-            const int fontSize = 20;
-            int messageTextWidth = SplashKit.TextWidth(t, font, fontSize);
-            SplashKit.DrawText(t, Color.Black, font, fontSize, _matrixEntryBox.X + (_matrixEntryBox.Width - messageTextWidth) / 2, _matrixEntryBox.Height / 2);
-        }
-
-        private void DrawBrackets()
-        {
-            int padding = 20;
-
-            // Draw Left Bits
-            SplashKit.DrawLine(Color.Black,
-                _matrixEntryBox.X + padding,    _matrixEntryBox.Y + padding,
-                _matrixEntryBox.X + 3*padding,  _matrixEntryBox.Y + padding);
-            SplashKit.DrawLine(Color.Black,
-                _matrixEntryBox.X + padding,    _matrixEntryBox.Y + _matrixEntryBox.Height - padding,
-                _matrixEntryBox.X + 3*padding,  _matrixEntryBox.Y + _matrixEntryBox.Height - padding);
-
-            // Draw Right Bits
-            SplashKit.DrawLine(Color.Black,
-                _matrixEntryBox.X + _matrixEntryBox.Width - padding,    _matrixEntryBox.Y + padding,
-                _matrixEntryBox.X + _matrixEntryBox.Width - 3*padding,  _matrixEntryBox.Y + padding);
-            SplashKit.DrawLine(Color.Black,
-                _matrixEntryBox.X + _matrixEntryBox.Width - padding,    _matrixEntryBox.Y + _matrixEntryBox.Height - padding,
-                _matrixEntryBox.X + _matrixEntryBox.Width - 3*padding,  _matrixEntryBox.Y + _matrixEntryBox.Height - padding);
-
-            // Draw Sides
-            SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + padding, _matrixEntryBox.Y + padding, _matrixEntryBox.X + padding, _matrixEntryBox.Y + _matrixEntryBox.Height - padding);
-            SplashKit.DrawLine(Color.Black, _matrixEntryBox.X + _matrixEntryBox.Width - padding, _matrixEntryBox.Y + padding, _matrixEntryBox.X + _matrixEntryBox.Width - padding, _matrixEntryBox.Y + _matrixEntryBox.Height - padding);
-
-        }
-
-        // ---------------------------------------------------------
         // State & Board Management
         // ---------------------------------------------------------
 
-        private void DrawMatrix(int Rows, int Cols)
+        private void Reset()
         {
-            Console.WriteLine($"Drawing matrix with dimensions: {Rows} x {Cols}");
-            // // Update temp rows and cols for later use when storing matrix data
-            // tempRows = Rows;
-            // tempCols = Cols;
-
-            // Draw the matrix entry box and the grid for entering matrix values
-            SplashKit.FillRectangle(Color.White, _matrixEntryBox);
-            SplashKit.DrawRectangle(Color.Black, _matrixEntryBox);
-
-            // Draw the Square Brackets
-            DrawBrackets();
-
-            // Store matrix
-            tempMatrix = MatrixFactory.CreateZMatrix(Rows, Cols);
-            Console.WriteLine($"Matrix created with dimensions: {tempMatrix.rows} x {tempMatrix.cols}");
-
-            // Update State
-            globalState = State.EnteringData;
-            // messageText = "Enter values for matrix";
-            // UpdateMessageText(messageText);
-        }
-
-        private void ClearBoard()
-        {
-            // Clear the matrix entry box
-            SplashKit.FillRectangle(Color.White, _matrixEntryBox);
-            SplashKit.DrawRectangle(Color.Black, _matrixEntryBox);
-            
-            // Reset
-            ResetVars();
-            Console.WriteLine("Matrix cleared");
-        }
-
-        private void ResetVars()
-        {
+            _renderVisuals.ClearBoard();
+            globalState = State.Idle;
             tempMatrix = new MatrixData();
             tempRows = 0;
             tempCols = 0;
@@ -614,12 +464,20 @@ namespace Matrix_Calculator
         // Store matrix
         void StoreMatrix(MatrixData M)
         {
-            // // Print rows and cols
-            // Console.WriteLine($"Rows: {M.rows}");
-            // Console.WriteLine($"Cols: {M.cols}");
+            // Store the matrix
+            if (_matrices[0].matrix == null)
+            {
+                _matrices[0] = M;
+            }
+            else
+            {
+                _matrices[1] = M;
+            }
 
+
+
+            // Print the matrix
             Console.WriteLine("Matrix contents:");
-
             PrintMatrix(M);
         }
 
@@ -634,6 +492,31 @@ namespace Matrix_Calculator
                     Console.Write($"{M.matrix[i, j]}, ");
                 }
                 Console.WriteLine();
+            }
+        }
+
+        // Display matrix on matrixEntryBox
+        void DisplayMatrix(MatrixData M, int x, int y, int w, int h)
+        {
+            Console.WriteLine($"Displaying matrix with dimensions: {M.rows} x {M.cols}");
+
+            // Iterate through the values
+            for (int i = 0; i < M.rows; i++)
+            {
+                for (int j = 0; j < M.cols; j++)
+                {
+                    string val = M.matrix[i, j].ToString();
+                    Font font = SplashKit.GetSystemFont();
+                    const int fontSize = 18;
+
+                    // Calculate grid positions based on provided dimensions and top-left corner
+                    double cellWidth = (w - 80) / (double)M.cols;
+                    double cellHeight = (h - 80) / (double)M.rows;
+                    double textX = x + 40 + (j * cellWidth) + (cellWidth / 2) - (SplashKit.TextWidth(val, font, fontSize) / 2);
+                    double textY = y + 40 + (i * cellHeight) + (cellHeight / 2) - (SplashKit.TextHeight(val, font, fontSize) / 2);
+
+                    SplashKit.DrawText(val, Color.Black, font, fontSize, textX, textY);
+                }
             }
         }
     }

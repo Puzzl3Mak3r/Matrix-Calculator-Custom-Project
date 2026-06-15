@@ -26,7 +26,7 @@ namespace Matrix_Calculator
             }
 
             // Dev: Print the zero matrix to console for verification
-            Console.WriteLine("Zero Matrix:");
+            Console.WriteLine($"Creating {rows} x {cols} Zero Matrix");
             Console.WriteLine();
 
             // Return the zero matrix
