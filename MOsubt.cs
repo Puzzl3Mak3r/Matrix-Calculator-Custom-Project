@@ -2,7 +2,7 @@ using System;
 
 namespace Matrix_Calculator
 {
-    public class MOadd : MatrixOperations
+    public class MOsubt : MatrixOperations
     {
 
         public override MatrixData Execute(MatrixData matrixA, MatrixData matrixB)
@@ -25,7 +25,7 @@ namespace Matrix_Calculator
             {
                 for (int j = 0; j < result.cols; j++)
                 {
-                    result.matrix[i, j] = matrixA.matrix[i, j] + matrixB.matrix[i, j];
+                    result.matrix[i, j] = matrixA.matrix[i, j] - matrixB.matrix[i, j];
                 }
             }
             

@@ -18,7 +18,11 @@ namespace Matrix_Calculator
         private Window _window;
         private RenderVisuals _renderVisuals;
         private MatrixMemento _matrixMemento;
-        private Operation _matrixOperation;
+        // Define Matrix operation classes
+        private MOadd _MOadd = new MOadd();
+        private MOsubt _MOsub = new MOsubt();
+        // private MOmult _MOmult = new MOmult();
+        private MatrixOperations _activeStrategy;
 
         // ---------------------------------------------------------
         // Temporary Variables
@@ -31,7 +35,6 @@ namespace Matrix_Calculator
         string currentKey = ""; // To store the user input
         bool matricesShown = false; // To check if matrices are already diaplyed in State.Idle
         bool clearMatrices = false;
-        
         
         // ---------------------------------------------------------
         // States
@@ -158,6 +161,12 @@ namespace Matrix_Calculator
                             {
                                 // Handle addition
                                 Console.WriteLine("Button Clicked: Add");
+                                _activeStrategy = _MOadd;
+                                _matrices[2] = _activeStrategy.Execute(_matrices[0], _matrices[1]);
+                                _renderVisuals.ClearBoard();
+                                matricesShown = false;
+                                globalState = State.ExecutingMath;
+                                PrintMatrix(_matrices[2]);
                             }
                             else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.SubtractButton))
                             {
@@ -288,11 +297,15 @@ namespace Matrix_Calculator
                         {
                             clearMatrices = true;
                             globalState = State.Idle;
+                            _renderVisuals.ClearBoard();
+                            matricesShown = false;
                             _renderVisuals.UpdateMessageText("Click to add matrix");
                         }
                         else if (cache == "Escape")
                         {
                             globalState = State.Idle;
+                            _renderVisuals.ClearBoard();
+                            matricesShown = false;
                             _renderVisuals.UpdateMessageText("Click to add matrix");
                         }
                     }
@@ -486,6 +499,29 @@ namespace Matrix_Calculator
                     }
                 }
 
+
+
+                // ---------------------------------------------------------
+                // State: ExecutingMath
+                // ---------------------------------------------------------
+
+                if (globalState == State.ExecutingMath)
+                {
+                    Console.WriteLine("Executing Math");
+                    _renderVisuals.ClearBoard();
+                    matricesShown = false;
+
+                    // Display the result matrix
+                    if (_matrices[2].matrix != null)
+                    {
+                        DisplayMatrix(_matrices[2], 185, 150, 370, 360);
+                        matricesShown = true;
+                    }
+
+                    // Return to Idle
+                    globalState = State.Idle;
+                }
+
                 // Update Screen // Remove\Comment out when final project is done to reduce power consumption, only use when debugging
                 SplashKit.RefreshScreen();
             }
@@ -509,6 +545,8 @@ namespace Matrix_Calculator
             currentCellY = 0;
             Console.WriteLine("Variables reset");
         }
+
+
 
         // ---------------------------------------------------------
         // Input & Validation
@@ -541,6 +579,8 @@ namespace Matrix_Calculator
 
             return input;
         }
+
+
 
         // ---------------------------------------------------------
         // Matrix Data Operations & Debugging

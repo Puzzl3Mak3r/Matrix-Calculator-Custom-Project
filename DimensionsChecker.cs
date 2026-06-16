@@ -2,13 +2,13 @@ using System;
 
 namespace Matrix_Calculator
 {
-    public class DimensionChecker
+    public class DimensionsChecker
     {
         bool CheckAdd(MatrixData A, MatrixData B)
         {
             bool Check = true;
 
-            
+
 
             return Check;
         }
