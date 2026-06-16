@@ -14,11 +14,15 @@ namespace Matrix_Calculator
     public class Program
     {
         // ---------------------------------------------------------
-        //  Window and Object Variables
+        // Variables & State
+        // ---------------------------------------------------------
+
+        // ---------------------------------------------------------
+        // Window and Object Variables
+
         private Window _window;
         private RenderVisuals _renderVisuals;
         private MatrixMemento _matrixMemento;
-        // Define Matrix operation classes
         private MOadd _MOadd = new MOadd();
         private MOsubt _MOsub = new MOsubt();
         private MOmult _MOmult = new MOmult();
@@ -26,7 +30,7 @@ namespace Matrix_Calculator
 
         // ---------------------------------------------------------
         // Temporary Variables
-        // They change a lot and handle carry data across the program
+
         int tempRows = 0;
         int tempCols = 0;
         string messageText = "Click to add Matrix"; // Initial message
@@ -36,8 +40,11 @@ namespace Matrix_Calculator
         bool matricesShown = false; // To check if matrices are already diaplyed in State.Idle
         bool shoRidOfMsg = false;
         
+
+
         // ---------------------------------------------------------
         // States
+
         enum State
         {
             Idle,
@@ -50,7 +57,8 @@ namespace Matrix_Calculator
         State previousState = State.Idle;
 
         // ---------------------------------------------------------
-        // Matrix
+        // Matrix Variables
+
         private MatrixData[] _matrices = new MatrixData[3]; // Stores Matrix A, B, and Result
         int currentCellX = 0;
         int currentCellY = 0;
@@ -61,14 +69,12 @@ namespace Matrix_Calculator
         // Initialization
         // ---------------------------------------------------------
 
-        // Main Method
         public static void Main()
         {
             Program program = new Program();
             program.Run();
         }
 
-        // Program
         public Program()
         {
             // Initialize window
@@ -98,7 +104,6 @@ namespace Matrix_Calculator
 
                 // ---------------------------------------------------------
                 // Print current key pressed
-                // ---------------------------------------------------------
 
                 if (SplashKit.AnyKeyPressed())
                 {
@@ -228,8 +233,6 @@ namespace Matrix_Calculator
                                     }
                                 }
                             }
-
-
 
                             // ---------------------------------------------------------
                             // 1 Matrix Functions
@@ -682,42 +685,8 @@ namespace Matrix_Calculator
 
 
         // ---------------------------------------------------------
-        // Matrix Data Operations & Debugging
+        // Matrix Display & Rendering
         // ---------------------------------------------------------
-
-        // Store matrix
-        void StoreMatrix(MatrixData M)
-        {
-            // Store the matrix
-            if (_matrices[0].matrix == null)
-            {
-                _matrices[0] = M;
-            }
-            else
-            {
-                _matrices[1] = M;
-            }
-
-
-
-            // Print the matrix
-            Console.WriteLine("Matrix contents:");
-            PrintMatrix(M);
-        }
-
-        void PrintMatrix(MatrixData M)
-        {
-            // Print each value
-            for (int i = 0; i < M.rows; i++)
-            {
-                for (int j = 0; j < M.cols; j++)
-                {
-                    // Console.WriteLine($"{i}, {j}, {M.matrix[i, j]}");
-                    Console.Write($"{M.matrix[i, j]}, ");
-                }
-                Console.WriteLine();
-            }
-        }
 
         // Rerender matrices with clearscreen
         void ReRenderMatrices()
@@ -762,6 +731,43 @@ namespace Matrix_Calculator
 
                     SplashKit.DrawText(val, Color.Black, font, fontSize, textX, textY);
                 }
+            }
+        }
+
+
+
+        // ---------------------------------------------------------
+        // Matrix Data Operations & Debugging
+        // ---------------------------------------------------------
+
+        void StoreMatrix(MatrixData M)
+        {
+            // Store the matrix
+            if (_matrices[0].matrix == null)
+            {
+                _matrices[0] = M;
+            }
+            else
+            {
+                _matrices[1] = M;
+            }
+
+            // Print the matrix
+            Console.WriteLine("Matrix contents:");
+            PrintMatrix(M);
+        }
+
+        void PrintMatrix(MatrixData M)
+        {
+            // Print each value
+            for (int i = 0; i < M.rows; i++)
+            {
+                for (int j = 0; j < M.cols; j++)
+                {
+                    // Console.WriteLine($"{i}, {j}, {M.matrix[i, j]}");
+                    Console.Write($"{M.matrix[i, j]}, ");
+                }
+                Console.WriteLine();
             }
         }
     }
