@@ -93,8 +93,6 @@ namespace Matrix_Calculator
             // Clear screen to prevent ghosting
             SplashKit.ClearScreen(Color.White);
             _renderVisuals.DrawUI();
-            messageText = "Click to add matrix";
-            _renderVisuals.UpdateMessageText(messageText); // First run
 
             // Main event loop
             while (!_window.CloseRequested)
@@ -337,6 +335,8 @@ namespace Matrix_Calculator
                     if (!matricesShown)
                     {
                         ReRenderMatrices();
+                        messageText = "Click to add matrix";
+                        _renderVisuals.UpdateMessageText(messageText);
                     }
 
                     // Matrix OnClicks Actions (Uses the same mousePos)
