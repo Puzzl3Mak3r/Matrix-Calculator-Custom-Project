@@ -29,7 +29,8 @@ namespace Matrix_Calculator
         string tempData = ""; // MultiPurpose string to store user input
         MatrixData tempMatrix;
         string currentKey = ""; // To store the user input
-        bool matricesShown = false;
+        bool matricesShown = false; // To check if matrices are already diaplyed in State.Idle
+        bool clearMatrices = false;
         
         
         // ---------------------------------------------------------
@@ -37,6 +38,7 @@ namespace Matrix_Calculator
         enum State
         {
             Idle,
+            ConfirmRidOfMatrix,
             EnteringDimensions,
             EnteringData,
             ExecutingMath
@@ -140,55 +142,69 @@ namespace Matrix_Calculator
 
                 if (SplashKit.MouseClicked(MouseButton.LeftButton))
                 {
-                    if (SplashKit.PointInRectangle(mousePos, _renderVisuals.AddButton))
+                    if (globalState != State.Idle)
                     {
-                        // Handle addition
-                        Console.WriteLine("Button Clicked: Add");
+                        // Prompt to only do it when its in idle
+                        Console.WriteLine("User attempted to use operation out of State.Idle");
+                        _renderVisuals.ClearBoard();
+                        matricesShown = false;
+                        _renderVisuals.UpdateMessageText($"{messageText}\nComplete the current matrix first");
                     }
-                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.SubtractButton))
+                    else 
                     {
-                        // Handle subtraction
-                        Console.WriteLine("Button Clicked: Subtract");
-                    }
-                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.MultiplyButton))
-                    {
-                        // Handle multiplication
-                        Console.WriteLine("Button Clicked: Multiply");
-                    }
-                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.TransposeButton))
-                    {
-                        // Handle transpose
-                        Console.WriteLine("Button Clicked: Transpose");
-                    }
-                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.InverseButton))
-                    {
-                        // Handle inverse
-                        Console.WriteLine("Button Clicked: Inverse");
-                    }
-                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.DeterminantButton))
-                    {
-                        // Handle determinant
-                        Console.WriteLine("Button Clicked: Determinant");
-                    }
-                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom1Button))
-                    {
-                        // Handle Bottom 1
-                        Console.WriteLine("Button Clicked: Bottom 1");
-                    }
-                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom2Button))
-                    {
-                        // Handle Bottom 2
-                        Console.WriteLine("Button Clicked: Bottom 2");
-                    }
-                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom3Button))
-                    {
-                        // Handle Bottom 3
-                        Console.WriteLine("Button Clicked: Bottom 3");
-                    }
-                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom4Button))
-                    {
-                        // Handle Bottom 4
-                        Console.WriteLine("Button Clicked: Bottom 4");
+                        if (_matrices[0].matrix != null && _matrices[1].matrix != null)
+                        {
+                            if (SplashKit.PointInRectangle(mousePos, _renderVisuals.AddButton))
+                            {
+                                // Handle addition
+                                Console.WriteLine("Button Clicked: Add");
+                            }
+                            else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.SubtractButton))
+                            {
+                                // Handle subtraction
+                                Console.WriteLine("Button Clicked: Subtract");
+                            }
+                            else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.MultiplyButton))
+                            {
+                                // Handle multiplication
+                                Console.WriteLine("Button Clicked: Multiply");
+                            }
+                            else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.TransposeButton))
+                            {
+                                // Handle transpose
+                                Console.WriteLine("Button Clicked: Transpose");
+                            }
+                            else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.InverseButton))
+                            {
+                                // Handle inverse
+                                Console.WriteLine("Button Clicked: Inverse");
+                            }
+                            else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.DeterminantButton))
+                            {
+                                // Handle determinant
+                                Console.WriteLine("Button Clicked: Determinant");
+                            }
+                            else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom1Button))
+                            {
+                                // Handle Bottom 1
+                                Console.WriteLine("Button Clicked: Bottom 1");
+                            }
+                            else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom2Button))
+                            {
+                                // Handle Bottom 2
+                                Console.WriteLine("Button Clicked: Bottom 2");
+                            }
+                            else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom3Button))
+                            {
+                                // Handle Bottom 3
+                                Console.WriteLine("Button Clicked: Bottom 3");
+                            }
+                            else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom4Button))
+                            {
+                                // Handle Bottom 4
+                                Console.WriteLine("Button Clicked: Bottom 4");
+                            }
+                        }
                     }
                 }
 
@@ -221,12 +237,63 @@ namespace Matrix_Calculator
                         // Adding Matrices OnClick
                         if (SplashKit.PointInRectangle(mousePos, _renderVisuals.MatrixEntryBox))
                         {
-                            // Change state to entering matrix
-                            Reset();
-                            matricesShown = false;
-                            globalState = State.EnteringDimensions; // Example for entering matrix A, can be changed based on user selection
-                            messageText = "How many Rows? (Esc to exit)";
-                            _renderVisuals.UpdateMessageText(messageText);
+                            if (_matrices[1].matrix != null)
+                            {
+                                if(clearMatrices)
+                                {
+                                    _matrices[0] = new MatrixData();
+                                    _matrices[1] = new MatrixData();
+                                    clearMatrices = false;
+                                }
+                                else
+                                {
+                                    // Confirm to get rid of current matrices
+                                    globalState = State.ConfirmRidOfMatrix;
+                                }
+                            }
+                            else
+                            {
+                                // Change state to entering matrix
+                                Reset();
+                                matricesShown = false;
+                                globalState = State.EnteringDimensions; // Example for entering matrix A, can be changed based on user selection
+                                messageText = "How many Rows? (Esc to exit)";
+                                _renderVisuals.UpdateMessageText(messageText);
+                            }
+                        }
+                    }
+                }
+
+
+
+                // ---------------------------------------------------------
+                // State: ConfirmRidOfMatrix // To confirm user to get rid of matrices
+                // ---------------------------------------------------------
+
+                if (globalState == State.ConfirmRidOfMatrix && !clearMatrices)
+                {
+                    if (previousState != State.ConfirmRidOfMatrix)
+                    {
+                        // Prompt user if they want to erase current 2 matrices
+                        _renderVisuals.ClearBoard();
+                        matricesShown = false;
+                        messageText = "Clear current 2 matrices? Yes(Enter) No(Esc)";
+                        _renderVisuals.UpdateMessageText(messageText);
+                    }
+                    
+                    if (!string.IsNullOrEmpty(currentKey))
+                    {
+                        string cache = GetValidKey(currentKey);
+                        if (cache == "Enter")
+                        {
+                            clearMatrices = true;
+                            globalState = State.Idle;
+                            _renderVisuals.UpdateMessageText("Click to add matrix");
+                        }
+                        else if (cache == "Escape")
+                        {
+                            globalState = State.Idle;
+                            _renderVisuals.UpdateMessageText("Click to add matrix");
                         }
                     }
                 }
@@ -423,6 +490,8 @@ namespace Matrix_Calculator
                 SplashKit.RefreshScreen();
             }
         }
+
+
 
         // ---------------------------------------------------------
         // State & Board Management

@@ -113,8 +113,16 @@ namespace Matrix_Calculator
             Console.WriteLine($"Message Text: '{t}'");
             Font font = SplashKit.GetSystemFont();
             const int fontSize = 20;
-            int messageTextWidth = SplashKit.TextWidth(t, font, fontSize);
-            SplashKit.DrawText(t, Color.Black, font, fontSize, MatrixEntryBox.X + (MatrixEntryBox.Width - messageTextWidth) / 2, (MatrixEntryBox.Height / 2) - 80); // Got to make it higher to be out of the way of matrices
+            double startY = (MatrixEntryBox.Height / 2) - 80;
+
+            // Split into multiple
+            string[] lines = t.Split('\n');
+            for (int i = 0; i < lines.Length; i++)
+            {
+                int messageTextWidth = SplashKit.TextWidth(lines[i], font, fontSize);
+                double x = MatrixEntryBox.X + (MatrixEntryBox.Width - messageTextWidth) / 2;
+                SplashKit.DrawText(lines[i], Color.Black, font, fontSize, x, startY + (i * (fontSize + 5)));
+            }
         }
 
         public void DrawBrackets(double x, double y, double w, double h)
