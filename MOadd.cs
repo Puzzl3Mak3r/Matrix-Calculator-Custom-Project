@@ -7,14 +7,7 @@ namespace Matrix_Calculator
 
         public override MatrixData Execute(MatrixData matrixA, MatrixData matrixB)
         {
-            // Run dimension Checker
-            if (!CheckDimensions(matrixA, matrixB))
-            {
-                Console.WriteLine("Error: Matrices must have the same dimensions for addition.");
-                return new MatrixData();
-            }
-
-            // Define Result matrix dimensions
+            // Define Result matrixdimensions
             MatrixData result = new MatrixData();
             result.rows = matrixA.rows;
             result.cols = matrixA.cols;

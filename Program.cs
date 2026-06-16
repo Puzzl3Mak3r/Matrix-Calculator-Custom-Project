@@ -21,7 +21,7 @@ namespace Matrix_Calculator
         // Define Matrix operation classes
         private MOadd _MOadd = new MOadd();
         private MOsubt _MOsub = new MOsubt();
-        // private MOmult _MOmult = new MOmult();
+        private MOmult _MOmult = new MOmult();
         private MatrixOperations _activeStrategy;
 
         // ---------------------------------------------------------
@@ -34,7 +34,7 @@ namespace Matrix_Calculator
         MatrixData tempMatrix;
         string currentKey = ""; // To store the user input
         bool matricesShown = false; // To check if matrices are already diaplyed in State.Idle
-        bool clearMatrices = false;
+        bool shoRidOfMsg = false;
         
         // ---------------------------------------------------------
         // States
@@ -155,43 +155,140 @@ namespace Matrix_Calculator
                     }
                     else 
                     {
-                        if (_matrices[0].matrix != null && _matrices[1].matrix != null)
+                        if (_matrices[0].matrix != null)
                         {
-                            if (SplashKit.PointInRectangle(mousePos, _renderVisuals.AddButton))
+                            if (_matrices[1].matrix != null)
                             {
-                                // Handle addition
-                                Console.WriteLine("Button Clicked: Add");
-                                _activeStrategy = _MOadd;
-                                _matrices[2] = _activeStrategy.Execute(_matrices[0], _matrices[1]);
-                                _renderVisuals.ClearBoard();
-                                matricesShown = false;
-                                globalState = State.ExecutingMath;
-                                PrintMatrix(_matrices[2]);
+                                // ---------------------------------------------------------
+                                // 2 Matrix functions
+
+                                if (SplashKit.PointInRectangle(mousePos, _renderVisuals.AddButton))
+                                {
+                                    // Run Dimension Checker
+                                    if (!(_matrices[0].rows == _matrices[1].rows && _matrices[0].cols == _matrices[1].cols))
+                                    {
+                                        ReRenderMatrices();
+                                        Console.WriteLine("Error: Matrices must have the same dimensions for addition");
+                                        _renderVisuals.UpdateMessageText($"{messageText}\nMatrices must have the same dimensions for addition");
+                                    }
+                                    else
+                                    {
+                                        // Handle addition: Set strategy to MOadd, execute, and prepare to display result
+                                        Console.WriteLine("Button Clicked: Add");
+                                        _activeStrategy = _MOadd;
+                                        _matrices[2] = _activeStrategy.Execute(_matrices[0], _matrices[1]);
+                                        _renderVisuals.ClearBoard(); // Clear UI for result display
+                                        matricesShown = false;
+                                        globalState = State.ExecutingMath;
+                                        PrintMatrix(_matrices[2]);
+                                    }
+                                }
+                                else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.SubtractButton))
+                                {
+                                    // Run Dimension Checker
+                                    if (!(_matrices[0].rows == _matrices[1].rows && _matrices[0].cols == _matrices[1].cols))
+                                    {
+                                        ReRenderMatrices();
+                                        Console.WriteLine("Error: Matrices must have the same dimensions for subtraction");
+                                        _renderVisuals.UpdateMessageText($"{messageText}\nMatrices must have the same dimensions for subtraction");
+                                    }
+                                    else
+                                    {
+                                        // Handle subtraction: Set strategy to MOsub, execute, and prepare to display result
+                                        Console.WriteLine("Button Clicked: Subtract");
+                                        _activeStrategy = _MOsub;
+                                        _matrices[2] = _activeStrategy.Execute(_matrices[0], _matrices[1]);
+                                        _renderVisuals.ClearBoard(); // Clear UI for result display
+                                        matricesShown = false;
+                                        globalState = State.ExecutingMath;
+                                        PrintMatrix(_matrices[2]);
+                                    }
+                                }
+                                else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.MultiplyButton))
+                                {
+                                    // Run Dimension Checker
+                                    if (_matrices[0].cols != _matrices[1].rows)
+                                    {
+                                        _renderVisuals.ClearBoard();
+                                        DisplayMatrix(_matrices[0], 10, 150, 370, 360);
+                                        DisplayMatrix(_matrices[1], 360, 150, 370, 360);
+                                        Console.WriteLine("Error: Matrices are not compatible for multiplication");
+                                        _renderVisuals.UpdateMessageText($"{messageText}\nMatrices are not compatible for multiplication");
+                                    }
+                                    else
+                                    {
+                                        // Handle multiplication
+                                        Console.WriteLine("Button Clicked: Multiply");
+                                        _activeStrategy = _MOmult;
+                                        _matrices[2] = _activeStrategy.Execute(_matrices[0], _matrices[1]);
+                                        _renderVisuals.ClearBoard(); // Clear UI for result display
+                                        matricesShown = false;
+                                        globalState = State.ExecutingMath;
+                                        PrintMatrix(_matrices[2]);
+                                    }
+                                }
                             }
-                            else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.SubtractButton))
+
+
+
+                            // ---------------------------------------------------------
+                            // 1 Matrix Functions
+
+                            if (SplashKit.PointInRectangle(mousePos, _renderVisuals.TransposeButton))
                             {
-                                // Handle subtraction
-                                Console.WriteLine("Button Clicked: Subtract");
-                            }
-                            else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.MultiplyButton))
-                            {
-                                // Handle multiplication
-                                Console.WriteLine("Button Clicked: Multiply");
-                            }
-                            else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.TransposeButton))
-                            {
-                                // Handle transpose
-                                Console.WriteLine("Button Clicked: Transpose");
+                                if (_matrices[1].matrix != null)
+                                {
+                                    ReRenderMatrices();
+                                    Console.WriteLine("Error: There are multiple matrices");
+                                    _renderVisuals.UpdateMessageText("There are multiple matrices\nPlease clear matrices, and enter 1 matrix");
+                                }
+                                else
+                                {
+                                    // Handle transpose
+                                    Console.WriteLine("Button Clicked: Transpose");
+                                }
                             }
                             else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.InverseButton))
                             {
-                                // Handle inverse
-                                Console.WriteLine("Button Clicked: Inverse");
+                                // Run Dimension Checker
+                                if (_matrices[0].rows != _matrices[0].cols)
+                                {
+                                    ReRenderMatrices();
+                                    Console.WriteLine("Error: Matrix must be square for inverse");
+                                    _renderVisuals.UpdateMessageText($"{messageText}\nMatrix must be square for inverse");
+                                }
+                                else if (_matrices[1].matrix != null)
+                                {
+                                    ReRenderMatrices();
+                                    Console.WriteLine("Error: There are multiple matrices");
+                                    _renderVisuals.UpdateMessageText("There are multiple matrices\nPlease clear matrices, and enter 1 matrix");
+                                }
+                                else
+                                {
+                                    // Handle inverse
+                                    Console.WriteLine("Button Clicked: Inverse");
+                                }
                             }
                             else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.DeterminantButton))
                             {
-                                // Handle determinant
-                                Console.WriteLine("Button Clicked: Determinant");
+                                // Run Dimension Checker
+                                if (_matrices[0].rows != _matrices[0].cols)
+                                {
+                                    ReRenderMatrices();
+                                    Console.WriteLine("Error: Matrix must be square for determinant");
+                                    _renderVisuals.UpdateMessageText($"{messageText}\nMatrix must be square for determinant");
+                                }
+                                else if (_matrices[1].matrix != null)
+                                {
+                                    ReRenderMatrices();
+                                    Console.WriteLine("Error: There are multiple matrices");
+                                    _renderVisuals.UpdateMessageText("There are multiple matrices\nPlease clear matrices, and enter 1 matrix");
+                                }
+                                else
+                                {
+                                    // Handle determinant
+                                    Console.WriteLine("Button Clicked: Determinant");
+                                }
                             }
                             else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom1Button))
                             {
@@ -207,11 +304,19 @@ namespace Matrix_Calculator
                             {
                                 // Handle Bottom 3
                                 Console.WriteLine("Button Clicked: Bottom 3");
+                                if (_matrices[2].matrix != null)
+                                {
+                                    _renderVisuals.UpdateMessageText("\nThere must be a valid equation");
+                                }
                             }
                             else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom4Button))
                             {
                                 // Handle Bottom 4
                                 Console.WriteLine("Button Clicked: Bottom 4");
+                                if (_matrices[2].matrix != null)
+                                {
+                                    _renderVisuals.UpdateMessageText("\nThere must be a valid equation");
+                                }
                             }
                         }
                     }
@@ -226,17 +331,9 @@ namespace Matrix_Calculator
                 if (globalState == State.Idle )
                 {
                     // Draw Matrix(s) if existing
-                    if (_matrices[1].matrix != null && !matricesShown)
+                    if (!matricesShown)
                     {
-                        // Display first matrix on left, second matrix on right
-                        DisplayMatrix(_matrices[0], 10, 150, 370, 360);
-                        DisplayMatrix(_matrices[1], 360, 150, 370, 360);
-                        matricesShown = true;
-                    } else if (_matrices[0].matrix != null && !matricesShown)
-                    {
-                        // Display first matrix in center
-                        DisplayMatrix(_matrices[0], 185, 150, 370, 360);
-                        matricesShown = true;
+                        ReRenderMatrices();
                     }
 
                     // Matrix OnClicks Actions (Uses the same mousePos)
@@ -248,17 +345,8 @@ namespace Matrix_Calculator
                         {
                             if (_matrices[1].matrix != null)
                             {
-                                if(clearMatrices)
-                                {
-                                    _matrices[0] = new MatrixData();
-                                    _matrices[1] = new MatrixData();
-                                    clearMatrices = false;
-                                }
-                                else
-                                {
-                                    // Confirm to get rid of current matrices
-                                    globalState = State.ConfirmRidOfMatrix;
-                                }
+                                // Confirm to get rid of current matrices
+                                globalState = State.ConfirmRidOfMatrix;
                             }
                             else
                             {
@@ -279,11 +367,12 @@ namespace Matrix_Calculator
                 // State: ConfirmRidOfMatrix // To confirm user to get rid of matrices
                 // ---------------------------------------------------------
 
-                if (globalState == State.ConfirmRidOfMatrix && !clearMatrices)
+                if (globalState == State.ConfirmRidOfMatrix)
                 {
-                    if (previousState != State.ConfirmRidOfMatrix)
+                    if (!shoRidOfMsg)
                     {
                         // Prompt user if they want to erase current 2 matrices
+                        shoRidOfMsg = true; // Don't overlap text
                         _renderVisuals.ClearBoard();
                         matricesShown = false;
                         messageText = "Clear current 2 matrices? Yes(Enter) No(Esc)";
@@ -295,18 +384,22 @@ namespace Matrix_Calculator
                         string cache = GetValidKey(currentKey);
                         if (cache == "Enter")
                         {
-                            clearMatrices = true;
-                            globalState = State.Idle;
+                            // Delete the matrices
+                            _matrices[0] = new MatrixData();
+                            _matrices[1] = new MatrixData();
+                            _matrices[2] = new MatrixData();
                             _renderVisuals.ClearBoard();
                             matricesShown = false;
                             _renderVisuals.UpdateMessageText("Click to add matrix");
+                            globalState = State.Idle;
+                            shoRidOfMsg = false; // Change for reuse
                         }
                         else if (cache == "Escape")
                         {
-                            globalState = State.Idle;
                             _renderVisuals.ClearBoard();
                             matricesShown = false;
                             _renderVisuals.UpdateMessageText("Click to add matrix");
+                            globalState = State.Idle;
                         }
                     }
                 }
@@ -509,19 +602,25 @@ namespace Matrix_Calculator
                 {
                     Console.WriteLine("Executing Math");
                     _renderVisuals.ClearBoard();
-                    matricesShown = false;
+                    DisplayMatrix(_matrices[2], 185, 150, 370, 360);
+                    PrintMatrix(_matrices[2]);
+                    matricesShown = true;
+                    Console.WriteLine($"messageText: {messageText}");
 
-                    // Display the result matrix
-                    if (_matrices[2].matrix != null)
+
+                    // Prompt the result and copy
+                    if (messageText != "Result:")
                     {
-                        DisplayMatrix(_matrices[2], 185, 150, 370, 360);
-                        matricesShown = true;
+                        messageText = "Result:";
+                        _renderVisuals.UpdateMessageText(messageText);
                     }
-
-                    // Return to Idle
-                    globalState = State.Idle;
+                    // Return to Idle if clicked
+                    if (SplashKit.MouseClicked(MouseButton.LeftButton))
+                    {
+                        globalState = State.Idle;
+                    }
+                    Console.WriteLine($"messageText: {messageText}");
                 }
-
                 // Update Screen // Remove\Comment out when final project is done to reduce power consumption, only use when debugging
                 SplashKit.RefreshScreen();
             }
@@ -617,6 +716,23 @@ namespace Matrix_Calculator
                     Console.Write($"{M.matrix[i, j]}, ");
                 }
                 Console.WriteLine();
+            }
+        }
+
+        // Rerender matrices with clearscreen
+        void ReRenderMatrices()
+        {
+            _renderVisuals.ClearBoard();
+            matricesShown = true;
+            if (_matrices[0].matrix != null && _matrices[1].matrix != null)
+            {
+                // Display first matrix on left, second matrix on right
+                DisplayMatrix(_matrices[0], 10, 150, 370, 360);
+                DisplayMatrix(_matrices[1], 360, 150, 370, 360);
+            } else if (_matrices[0].matrix != null)
+            {
+                // Display first matrix in center
+                DisplayMatrix(_matrices[0], 185, 150, 370, 360);
             }
         }
 
