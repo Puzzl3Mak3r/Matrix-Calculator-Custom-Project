@@ -1,23 +1,22 @@
 using System;
 namespace Matrix_Calculator
 {
-    public class MOsubt : MO
+    public class MOdetr : MO
     {
-
-        public override MatrixData ExecuteTwo(MatrixData matrixA, MatrixData matrixB)
+        public override MatrixData ExecuteOne(MatrixData matrixA)
         {
             // Define Result matrix dimensions
             MatrixData result = new MatrixData();
             result.rows = matrixA.rows;
-            result.cols = matrixA.cols;
+            result.cols = matrixA.rows; // Its a square matrix
             result.matrix = new double[result.rows, result.cols];
 
-            // Run Addition
-            for (int i = 0; i < result.rows; i++)
+            // Run determinant
+            for (int i = 0; i < matrixA.rows; i++)
             {
-                for (int j = 0; j < result.cols; j++)
+                for (int j = 0; j < matrixA.cols; j++)
                 {
-                    result.matrix[i, j] = matrixA.matrix[i, j] - matrixB.matrix[i, j];
+                    
                 }
             }
 

@@ -1,11 +1,10 @@
 using System;
-
 namespace Matrix_Calculator
 {
-    public class MOadd : MatrixOperations
+    public class MOadd : MO
     {
 
-        public override MatrixData Execute(MatrixData matrixA, MatrixData matrixB)
+        public override MatrixData ExecuteTwo(MatrixData matrixA, MatrixData matrixB)
         {
             // Define Result matrixdimensions
             MatrixData result = new MatrixData();
@@ -21,7 +20,8 @@ namespace Matrix_Calculator
                     result.matrix[i, j] = matrixA.matrix[i, j] + matrixB.matrix[i, j];
                 }
             }
-            
+
+            // Return result
             return result;
         }
     }

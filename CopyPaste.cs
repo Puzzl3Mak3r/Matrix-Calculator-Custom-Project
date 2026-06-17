@@ -1,4 +1,5 @@
 using System;
+using TextCopy;
 
 namespace Matrix_Calculator
 {
@@ -9,12 +10,31 @@ namespace Matrix_Calculator
         public virtual void CopyToClipboard(string text)
         {
             // TODO: Implement direct OS clipboard integration
-            throw new NotImplementedException("Clipboard copy not implemented yet");
+            Console.WriteLine("Copy To Clipboard");
+            // 1. The string you want to copy
+            string demoTest = "test success!"; 
+
+            // (Later, this will be your LaTeX string)
+            // string demoTest = "\\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}";
+
+            try
+            {
+                // 2. The command that sends it to the OS clipboard
+                ClipboardService.SetText(demoTest);
+                
+                Console.WriteLine("Successfully copied to clipboard!");
+            }
+            catch (Exception ex)
+            {
+                // Always good to catch exceptions in case the OS blocks clipboard access
+                Console.WriteLine($"Clipboard error: {ex.Message}");
+            }
         }
 
         public virtual string PasteFromClipboard()
         {
             // TODO: Implement direct OS clipboard integration
+            Console.WriteLine("Paste From Clipboard");
             throw new NotImplementedException("Clipboard paste not implemented yet");
         }
     }

@@ -1,18 +1,10 @@
 using System;
-
 namespace Matrix_Calculator
 {
-    public class MOmult : MatrixOperations
+    public class MOmult : MO
     {
-        public override MatrixData Execute(MatrixData matrixA, MatrixData matrixB)
+        public override MatrixData ExecuteTwo(MatrixData matrixA, MatrixData matrixB)
         {
-            // // Run specific dimension checker for Dot Product compatibility
-            // if (matrixA.cols != matrixB.rows)
-            // {
-            //     Console.WriteLine("Error: Matrix A columns must equal Matrix B rows for multiplication.");
-            //     return new MatrixData(); 
-            // }
-
             // Define Result matrix dimensions (Rows of A, Cols of B)
             MatrixData result = new MatrixData();
             result.rows = matrixA.rows;
@@ -32,7 +24,8 @@ namespace Matrix_Calculator
                     }
                 }
             }
-            
+
+            // Return result
             return result;
         }
     }

@@ -3,7 +3,7 @@ using SplashKitSDK;
 
 namespace Matrix_Calculator
 {
-    // Matrix Enum
+    // Program-wide Matrix Enum
     public struct MatrixData
     {
         public int rows; // rows
@@ -22,11 +22,14 @@ namespace Matrix_Calculator
 
         private Window _window;
         private RenderVisuals _renderVisuals;
-        private MatrixMemento _matrixMemento;
+        // private MatrixMemento _matrixMemento;
         private MOadd _MOadd = new MOadd();
-        private MOsubt _MOsub = new MOsubt();
+        private MOsubt _MOsubt = new MOsubt();
         private MOmult _MOmult = new MOmult();
-        private MatrixOperations _activeStrategy;
+        private MOtran _MOtran = new MOtran();
+        private MOinvr _MOinvr = new MOinvr();
+        private MOdetr _MOdetr = new MOdetr();
+        private CopyPaste _CopyPaste = new CopyPaste();
 
         // ---------------------------------------------------------
         // Temporary Variables
@@ -51,17 +54,19 @@ namespace Matrix_Calculator
             ConfirmRidOfMatrix,
             EnteringDimensions,
             EnteringData,
-            ExecutingMath
+            ExecutingMath,
+            CopyPasting
         };
         State globalState = State.Idle;
         State previousState = State.Idle;
 
         // ---------------------------------------------------------
-        // Matrix Variables
+        // Matrix and Equation Variables
 
         private MatrixData[] _matrices = new MatrixData[3]; // Stores Matrix A, B, and Result
         int currentCellX = 0;
         int currentCellY = 0;
+        string mathUsed = ""; // Tracking math to be use in copy paste
 
 
 
@@ -163,7 +168,7 @@ namespace Matrix_Calculator
                             if (_matrices[1].matrix != null)
                             {
                                 // ---------------------------------------------------------
-                                // 2 Matrix functions
+                                // 1. Two Matrix functions
 
                                 if (SplashKit.PointInRectangle(mousePos, _renderVisuals.AddButton))
                                 {
@@ -178,12 +183,12 @@ namespace Matrix_Calculator
                                     {
                                         // Handle addition: Set strategy to MOadd, execute, and prepare to display result
                                         Console.WriteLine("Button Clicked: Add");
-                                        _activeStrategy = _MOadd;
-                                        _matrices[2] = _activeStrategy.Execute(_matrices[0], _matrices[1]);
+                                        _matrices[2] = _MOadd.ExecuteTwo(_matrices[0], _matrices[1]);
                                         _renderVisuals.ClearBoard(); // Clear UI for result display
                                         matricesShown = false;
                                         globalState = State.ExecutingMath;
                                         PrintMatrix(_matrices[2]);
+                                        mathUsed = "add";
                                     }
                                 }
                                 else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.SubtractButton))
@@ -199,12 +204,12 @@ namespace Matrix_Calculator
                                     {
                                         // Handle subtraction: Set strategy to MOsub, execute, and prepare to display result
                                         Console.WriteLine("Button Clicked: Subtract");
-                                        _activeStrategy = _MOsub;
-                                        _matrices[2] = _activeStrategy.Execute(_matrices[0], _matrices[1]);
+                                        _matrices[2] = _MOsubt.ExecuteTwo(_matrices[0], _matrices[1]);
                                         _renderVisuals.ClearBoard(); // Clear UI for result display
                                         matricesShown = false;
                                         globalState = State.ExecutingMath;
                                         PrintMatrix(_matrices[2]);
+                                        mathUsed = "subtract";
                                     }
                                 }
                                 else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.MultiplyButton))
@@ -222,18 +227,18 @@ namespace Matrix_Calculator
                                     {
                                         // Handle multiplication
                                         Console.WriteLine("Button Clicked: Multiply");
-                                        _activeStrategy = _MOmult;
-                                        _matrices[2] = _activeStrategy.Execute(_matrices[0], _matrices[1]);
+                                        _matrices[2] = _MOmult.ExecuteTwo(_matrices[0], _matrices[1]);
                                         _renderVisuals.ClearBoard(); // Clear UI for result display
                                         matricesShown = false;
                                         globalState = State.ExecutingMath;
                                         PrintMatrix(_matrices[2]);
+                                        mathUsed = "multiply";
                                     }
                                 }
                             }
 
                             // ---------------------------------------------------------
-                            // 1 Matrix Functions
+                            // 2. One Matrix Functions
 
                             if (SplashKit.PointInRectangle(mousePos, _renderVisuals.TransposeButton))
                             {
@@ -247,6 +252,12 @@ namespace Matrix_Calculator
                                 {
                                     // Handle transpose
                                     Console.WriteLine("Button Clicked: Transpose");
+                                    _matrices[2] = _MOtran.ExecuteOne(_matrices[0]);
+                                    _renderVisuals.ClearBoard();
+                                    matricesShown = false;
+                                    globalState = State.ExecutingMath;
+                                    PrintMatrix(_matrices[2]);
+                                    mathUsed = "transpose";
                                 }
                             }
                             else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.InverseButton))
@@ -268,6 +279,12 @@ namespace Matrix_Calculator
                                 {
                                     // Handle inverse
                                     Console.WriteLine("Button Clicked: Inverse");
+                                    _matrices[2] = _MOinvr.ExecuteOne(_matrices[0]);
+                                    _renderVisuals.ClearBoard();
+                                    matricesShown = false;
+                                    globalState = State.ExecutingMath;
+                                    PrintMatrix(_matrices[2]);
+                                    mathUsed = "inverse";
                                 }
                             }
                             else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.DeterminantButton))
@@ -289,36 +306,87 @@ namespace Matrix_Calculator
                                 {
                                     // Handle determinant
                                     Console.WriteLine("Button Clicked: Determinant");
+                                    _matrices[2] = _MOdetr.ExecuteOne(_matrices[0]);
+                                    _renderVisuals.ClearBoard();
+                                    matricesShown = false;
+                                    globalState = State.ExecutingMath;
+                                    PrintMatrix(_matrices[2]);
+                                    mathUsed = "determinant";
                                 }
                             }
-                            else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom1Button))
-                            {
-                                // Handle Bottom 1
-                                Console.WriteLine("Button Clicked: Bottom 1");
-                            }
-                            else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom2Button))
-                            {
-                                // Handle Bottom 2
-                                Console.WriteLine("Button Clicked: Bottom 2");
-                            }
-                            else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom3Button))
-                            {
-                                // Handle Bottom 3
-                                Console.WriteLine("Button Clicked: Bottom 3");
-                                if (_matrices[2].matrix != null)
-                                {
-                                    _renderVisuals.UpdateMessageText("\nThere must be a valid equation");
-                                }
-                            }
-                            else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom4Button))
-                            {
-                                // Handle Bottom 4
-                                Console.WriteLine("Button Clicked: Bottom 4");
-                                if (_matrices[2].matrix != null)
-                                {
-                                    _renderVisuals.UpdateMessageText("\nThere must be a valid equation");
-                                }
-                            }
+                        }
+                    }
+                    
+                    // ---------------------------------------------------------
+                    // 3. Bottom Buttons
+
+                    // Handle Bottom 1
+                    // Copy Equation // Copy/Paste Raw
+                    if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom1Button))
+                    {
+                        Console.WriteLine("Button Clicked: Bottom 1");
+                        _CopyPaste.CopyToClipboard("t");
+
+                        // Copying Equation
+                        if (globalState == State.Idle)
+                        {
+                            
+                        }
+                        // Copy/Paste Raw
+                        else if (globalState == State.CopyPasting)
+                        {
+                            
+                        }
+                    }
+                    // Handle Bottom 2
+                    // Paste Equation // Copy/Paste LaTeX
+                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom2Button))
+                    {
+                        Console.WriteLine("Button Clicked: Bottom 2");
+
+                        // Pasting Equation
+                        if (globalState == State.Idle)
+                        {
+                            
+                        }
+                        // Copy/Paste LaTeX
+                        else if (globalState == State.CopyPasting)
+                        {
+                            
+                        }
+                    }
+                    // Handle Bottom 3
+                    // Copy Result // Copy/Paste ASCII
+                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom3Button))
+                    {
+                        Console.WriteLine("Button Clicked: Bottom 3");
+                        
+                        // Copying Result
+                        if (globalState == State.Idle)
+                        {
+                            
+                        }
+                        // Copy/Paste ASCII
+                        else if (globalState == State.CopyPasting)
+                        {
+                            
+                        }
+                    }
+                    // Handle Bottom 4
+                    // Paste Result // Cancel
+                    else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom4Button))
+                    {
+                        Console.WriteLine("Button Clicked: Bottom 4");
+                        
+                        // Pasting Result
+                        if (globalState == State.Idle)
+                        {
+                            
+                        }
+                        // Cancel
+                        else if (globalState == State.CopyPasting)
+                        {
+                            globalState = State.Idle;
                         }
                     }
                 }
