@@ -1,27 +1,26 @@
 using System;
 namespace Matrix_Calculator
 {
-    public class MOdetr : MO
+    public class MOdetr
     {
-        public override MatrixData ExecuteOne(MatrixData matrixA)
+        public double CalculateDeterminant(MatrixData matrixA)
         {
-            // Define Result matrix dimensions
-            MatrixData result = new MatrixData();
-            result.rows = matrixA.rows;
-            result.cols = matrixA.rows; // Its a square matrix
-            result.matrix = new double[result.rows, result.cols];
+            double determinant = 0;
 
-            // Run determinant
-            for (int i = 0; i < matrixA.rows; i++)
+            // Only supports 2x2 and 3x3 matrices
+            if (matrixA.rows == 2 && matrixA.cols == 2)
             {
-                for (int j = 0; j < matrixA.cols; j++)
-                {
-                    
-                }
+                determinant = (matrixA.matrix[0, 0] * matrixA.matrix[1, 1]) - (matrixA.matrix[0, 1] * matrixA.matrix[1, 0]);
+            }
+            else if (matrixA.rows == 3 && matrixA.cols == 3)
+            {
+                determinant = 
+                      matrixA.matrix[0, 0] * ((matrixA.matrix[1, 1] * matrixA.matrix[2, 2]) - (matrixA.matrix[1, 2] * matrixA.matrix[2, 1]))
+                    - matrixA.matrix[0, 1] * ((matrixA.matrix[1, 0] * matrixA.matrix[2, 2]) - (matrixA.matrix[1, 2] * matrixA.matrix[2, 0]))
+                    + matrixA.matrix[0, 2] * ((matrixA.matrix[1, 0] * matrixA.matrix[2, 1]) - (matrixA.matrix[1, 1] * matrixA.matrix[2, 0]));
             }
 
-            // Return result
-            return result;
+            return determinant;
         }
     }
 }

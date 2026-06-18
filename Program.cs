@@ -265,18 +265,29 @@ namespace Matrix_Calculator
                             }
                             else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.InverseButton))
                             {
-                                // Run Dimension Checker
-                                if (_matrices[0].rows != _matrices[0].cols)
-                                {
-                                    ReRenderMatrices();
-                                    Console.WriteLine("Error: Matrix must be square for inverse");
-                                    _renderVisuals.UpdateMessageText($"{messageText}\nMatrix must be square for inverse");
-                                }
-                                else if (_matrices[1].matrix != null)
+                                if (_matrices[1].matrix != null) // Checks if a second matrix exists
                                 {
                                     ReRenderMatrices();
                                     Console.WriteLine("Error: There are multiple matrices");
                                     _renderVisuals.UpdateMessageText("There are multiple matrices\nPlease clear matrices, and enter 1 matrix");
+                                }
+                                else if (_matrices[0].rows != _matrices[0].cols) // Checks if the matrix is a square
+                                {
+                                    ReRenderMatrices();
+                                    Console.WriteLine("Error: Matrix must be square for determinant");
+                                    _renderVisuals.UpdateMessageText($"{messageText}\nMatrix must be square for determinant");
+                                }
+                                else if (_matrices[0].rows != 2 && _matrices[0].rows != 3) // Checks if it is a 2x2 or 3x3 matrix
+                                {
+                                    ReRenderMatrices();
+                                    Console.WriteLine("Error: Not a 2x2 or 3x3 matrix");
+                                    _renderVisuals.UpdateMessageText($"{messageText}\nInverse only supports 2x2 or 3x3 matrix");
+                                }
+                                else if (_MOdetr.CalculateDeterminant(_matrices[0]) == 0) // Checks if the matrix is singular
+                                {
+                                    ReRenderMatrices();
+                                    Console.WriteLine("Error: Matrix is singular (determinant is 0)");
+                                    _renderVisuals.UpdateMessageText($"{messageText}\nMatrix is singular (cannot be inverted)");
                                 }
                                 else
                                 {
@@ -293,23 +304,38 @@ namespace Matrix_Calculator
                             else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.DeterminantButton))
                             {
                                 // Run Dimension Checker
-                                if (_matrices[0].rows != _matrices[0].cols)
-                                {
-                                    ReRenderMatrices();
-                                    Console.WriteLine("Error: Matrix must be square for determinant");
-                                    _renderVisuals.UpdateMessageText($"{messageText}\nMatrix must be square for determinant");
-                                }
-                                else if (_matrices[1].matrix != null)
+                                
+                                if (_matrices[1].matrix != null)
                                 {
                                     ReRenderMatrices();
                                     Console.WriteLine("Error: There are multiple matrices");
                                     _renderVisuals.UpdateMessageText("There are multiple matrices\nPlease clear matrices, and enter 1 matrix");
                                 }
+                                else if (_matrices[0].rows != _matrices[0].cols)
+                                {
+                                    ReRenderMatrices();
+                                    Console.WriteLine("Error: Matrix must be square for determinant");
+                                    _renderVisuals.UpdateMessageText($"{messageText}\nMatrix must be square for determinant");
+                                }
+                                else if (_matrices[0].rows != 2 && _matrices[0].rows != 3)
+                                {
+                                    ReRenderMatrices();
+                                    Console.WriteLine("Error: Not a 2x2 or 3x3 matrix");
+                                    _renderVisuals.UpdateMessageText($"{messageText}\nDeterminant only supports 2x2 or 3x3 matrix");
+                                }
                                 else
                                 {
                                     // Handle determinant
                                     Console.WriteLine("Button Clicked: Determinant");
-                                    _matrices[2] = _MOdetr.ExecuteOne(_matrices[0]);
+                                    double det = _MOdetr.CalculateDeterminant(_matrices[0]);
+                                    
+                                    // Store into a 1x1 matrix
+                                    _matrices[2] = new MatrixData();
+                                    _matrices[2].rows = 1;
+                                    _matrices[2].cols = 1;
+                                    _matrices[2].matrix = new double[1, 1];
+                                    _matrices[2].matrix[0, 0] = det;
+                                    
                                     _renderVisuals.ClearBoard();
                                     matricesShown = false;
                                     globalState = State.ExecutingMath;
@@ -740,6 +766,11 @@ namespace Matrix_Calculator
                     copyHandler.CopyToClipboard(clipboardText);
                 }
             }
+            // Message user it has been copied
+            Console.WriteLine("Copied to clipboard");
+            ReRenderMatrices();
+            _renderVisuals.UpdateMessageText($"Copied to clipboard\nClick to continue");
+
             // Return to Idle after action is completed
             copyMethodUsed = "";
             globalState = State.Idle;

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Matrix_Calculator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1cbb51420eb4a0f8560d1204283e9dd5df7c2e49")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+777571f7e7b7205598c3e3cc5b475537e17d547c")]
 [assembly: System.Reflection.AssemblyProductAttribute("Matrix_Calculator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Matrix_Calculator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
