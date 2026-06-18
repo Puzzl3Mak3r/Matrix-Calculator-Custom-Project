@@ -63,17 +63,17 @@ classDiagram
     }
 
     %% Copy + Paste
-    class CopyPaste {
+    class Copy {
         +CopyToClipboard(string text)
         +PasteFromClipboard() string
     }
 
-    class CopyPasteLaTeX {
+    class CopyLaTeX {
         +CopyToClipboard(string text)
         +PasteFromClipboard() string
     }
 
-    class CopyPasteASCII {
+    class CopyASCII {
         +CopyToClipboard(string text)
         +PasteFromClipboard() string
     }
@@ -115,7 +115,7 @@ classDiagram
     Program --> UserInput : Uses
     Program --> Operation : Uses Strategy
     Program --> MatrixFactory : Uses
-    Program --> CopyPaste : Uses
+    Program --> Copy : Uses
     Matrix --> MatrixMemento : Creates / Restores
     MatrixFactory --> Matrix : Creates
     Matrix --> MatrixData : Uses
@@ -125,6 +125,6 @@ classDiagram
     Operation <|-- OperationTranspose
     Operation <|-- OperationInvert
     Operation <|-- OperationDeterminant
-    CopyPaste <|-- CopyPasteLaTeX
-    CopyPaste <|-- CopyPasteASCII
+    Copy <|-- CopyLaTeX
+    Copy <|-- CopyASCII
 ```

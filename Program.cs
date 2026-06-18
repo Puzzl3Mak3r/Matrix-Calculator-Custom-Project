@@ -29,9 +29,9 @@ namespace Matrix_Calculator
         private MOtran _MOtran = new MOtran();
         private MOinvr _MOinvr = new MOinvr();
         private MOdetr _MOdetr = new MOdetr();
-        private CopyPaste _CopyPaste = new CopyPaste();
-        private CopyPasteLaTeX _CopyPasteLaTeX = new CopyPasteLaTeX();
-        private CopyPasteASCII _CopyPasteASCII = new CopyPasteASCII();
+        private Copy _Copy = new Copy();
+        private CopyLaTeX _CopyLaTeX = new CopyLaTeX();
+        private CopyASCII _CopyASCII = new CopyASCII();
 
         // ---------------------------------------------------------
         // Temporary Variables
@@ -69,7 +69,7 @@ namespace Matrix_Calculator
         int currentCellX = 0;
         int currentCellY = 0;
         string mathUsed = ""; // Tracking math to be use in copy paste
-        string cpUsed = ""; // Tracking what copy paste function to use
+        string copyMethodUsed = ""; // Tracking what copy paste function to use
 
 
 
@@ -330,14 +330,14 @@ namespace Matrix_Calculator
                         // Copying Equation
                         if (globalState == State.Idle)
                         {
-                            cpUsed = "copyE";
+                            copyMethodUsed = "copyE";
                             globalState = State.CopyPasting;
                             _renderVisuals.DrawBButtons2();
                         }
                         // Copy/Paste Raw
                         else if (globalState == State.CopyPasting)
                         {
-                            HandleCopyPasteAction(_CopyPaste);
+                            HandleCopyAction(_Copy);
                         }
                     }
                     // Handle Bottom 2
@@ -349,7 +349,7 @@ namespace Matrix_Calculator
                         // Copy LaTeX
                         if (globalState == State.CopyPasting)
                         {
-                            HandleCopyPasteAction(_CopyPasteLaTeX);
+                            HandleCopyAction(_CopyLaTeX);
                         }
                     }
                     // Handle Bottom 3
@@ -361,14 +361,14 @@ namespace Matrix_Calculator
                         // Copying Result
                         if (globalState == State.Idle)
                         {
-                            cpUsed = "copyR";
+                            copyMethodUsed = "copyR";
                             globalState = State.CopyPasting;
                             _renderVisuals.DrawBButtons2();
                         }
                         // Copy ASCII
                         else if (globalState == State.CopyPasting)
                         {
-                            HandleCopyPasteAction(_CopyPasteASCII);
+                            HandleCopyAction(_CopyASCII);
                         }
                     }
                     // Handle Bottom 4
@@ -380,7 +380,7 @@ namespace Matrix_Calculator
                         // Exit
                         if (globalState == State.CopyPasting)
                         {
-                            cpUsed = "";
+                            copyMethodUsed = "";
                             globalState = State.Idle;
                             _renderVisuals.DrawBButtons1();
                         }
@@ -483,7 +483,7 @@ namespace Matrix_Calculator
                 {
                     if (previousState != State.CopyPasting)
                     {
-                        Console.WriteLine(cpUsed);
+                        Console.WriteLine(copyMethodUsed);
                     }
                 }
 
@@ -711,18 +711,18 @@ namespace Matrix_Calculator
             }
         }
 
-        private void HandleCopyPasteAction(CopyPaste cpHandler)
+        private void HandleCopyAction(Copy copyHandler)
         {
-            if (cpUsed == "copyR") // Handle copying just the result matrix
+            if (copyMethodUsed == "copyR") // Handle copying just the result matrix
             {
                 if (_matrices[2].matrix != null) // Ensure there is a result to copy
                 {
-                    string clipboardText = cpHandler.MatrixToText(_matrices[2]);
+                    string clipboardText = copyHandler.MatrixToText(_matrices[2]);
                     Console.WriteLine(clipboardText);
-                    cpHandler.CopyToClipboard(clipboardText);
+                    copyHandler.CopyToClipboard(clipboardText);
                 }
             }
-            else if (cpUsed == "copyE") // Handle copying the full equation
+            else if (copyMethodUsed == "copyE") // Handle copying the full equation
             {
                 if (_matrices[0].matrix != null && mathUsed != "")
                 {
@@ -730,18 +730,18 @@ namespace Matrix_Calculator
                     // Format for unary operations like transpose, inverse, determinant
                     if (mathUsed == "transpose" || mathUsed == "inverse" || mathUsed == "determinant")
                     {
-                        clipboardText = $"{mathUsed} {cpHandler.MatrixToText(_matrices[0])} = {cpHandler.MatrixToText(_matrices[2])}";
+                        clipboardText = $"{mathUsed}\n{copyHandler.MatrixToText(_matrices[0])}\n=\n{copyHandler.MatrixToText(_matrices[2])}";
                     }
                     else // Format for binary operations like addition, subtraction, multiplication
                     {
-                        clipboardText = $"{cpHandler.MatrixToText(_matrices[0])} {mathUsed} {cpHandler.MatrixToText(_matrices[1])} = {cpHandler.MatrixToText(_matrices[2])}";
+                        clipboardText = $"{copyHandler.MatrixToText(_matrices[0])}\n{mathUsed}\n{copyHandler.MatrixToText(_matrices[1])}\n=\n{copyHandler.MatrixToText(_matrices[2])}";
                     }
                     Console.WriteLine(clipboardText);
-                    cpHandler.CopyToClipboard(clipboardText);
+                    copyHandler.CopyToClipboard(clipboardText);
                 }
             }
             // Return to Idle after action is completed
-            cpUsed = "";
+            copyMethodUsed = "";
             globalState = State.Idle;
             _renderVisuals.DrawBButtons1();
         }
@@ -876,7 +876,7 @@ namespace Matrix_Calculator
         void PrintMatrix(MatrixData M)
         {
             // Use MatrixToText
-            Console.WriteLine(_CopyPaste.MatrixToText(M));
+            Console.WriteLine(_Copy.MatrixToText(M));
         }
     }
 }

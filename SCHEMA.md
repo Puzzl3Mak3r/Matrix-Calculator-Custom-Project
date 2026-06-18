@@ -97,9 +97,9 @@ To meet the 10-30 class requirement, the project will implement the following st
 7. `OperationTranspose`
 8. `OperationInvert` (Inverts the matrix, so that Matrix * Invert = Identity Matrix)
 9. `OperationDeterminant` (Calculates the determinant of a matrix)
-10. `CopyPaste` (Direct)
-11. `CopyPasteLaTeX` (Polymorphed to LaTeX)
-12. `CopyPasteASCII` (Polymorphed to Formatted ASCII)
+10. `Copy` (Direct)
+11. `CopyLaTeX` (Polymorphed to LaTeX)
+12. `CopyASCII` (Polymorphed to Formatted ASCII)
 13. `UserInput` (Handles the step-by-step matrix data entry and keystroke management)
 
 The developer agent must construct the codebase using the following precise class breakdowns:

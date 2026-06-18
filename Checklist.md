@@ -47,6 +47,6 @@ Eliminate the "God Class" behavior of `Program.cs`.
 
 ### Phase 6: OS Clipboard Integration (Commands)
 Implement the OS clipboard text routing and conversions.
-* [ ] Figure out the System API hook (e.g., `System.Windows.Forms.Clipboard` or `TextCopy`) and implement it in `CopyPaste.cs`.
-* [ ] Implement the LaTeX string formatting logic in `CopyPasteLaTeX.cs`.
-* [ ] Implement the visual ASCII formatting logic in `CopyPasteASCII.cs`.
+* [ ] Figure out the System API hook (e.g., `System.Windows.Forms.Clipboard` or `TextCopy`) and implement it in `Copy.cs`.
+* [ ] Implement the LaTeX string formatting logic in `CopyLaTeX.cs`.
+* [ ] Implement the visual ASCII formatting logic in `CopyASCII.cs`.

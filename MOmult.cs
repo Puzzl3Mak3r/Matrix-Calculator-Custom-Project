@@ -21,6 +21,8 @@ namespace Matrix_Calculator
                     for (int k = 0; k < matrixA.cols; k++) // Or matrixB.rows
                     {
                         result.matrix[i, j] += matrixA.matrix[i, k] * matrixB.matrix[k, j];
+                        // Round, sometimes decimal rounding is off by a bit from double precision data type
+                        result.matrix[i, j] = Math.Round(result.matrix[i, j] * 100000) / 100000;
                     }
                 }
             }
