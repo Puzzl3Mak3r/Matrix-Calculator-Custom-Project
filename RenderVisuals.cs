@@ -57,10 +57,37 @@ namespace Matrix_Calculator
             SplashKit.DrawRectangle(Color.Black, MatrixEntryBox);
 
             // Draw the bottom buttons
+            DrawBButtons1();
+        }
+
+        public void DrawBButtons1()
+        {
+            Console.WriteLine("Drawing Bottom Buttons 1");
+            // Clear the the bottom buttons, then redraw them
+            SplashKit.FillRectangle(Color.White, Bottom1Button);
+            SplashKit.FillRectangle(Color.White, Bottom2Button);
+            SplashKit.FillRectangle(Color.White, Bottom3Button);
+            SplashKit.FillRectangle(Color.White, Bottom4Button);
+
             DrawButton(Bottom1Button, "Copy Equation");
-            DrawButton(Bottom2Button, "Paste Equation");
+            DrawButton(Bottom2Button, "Unused");
             DrawButton(Bottom3Button, "Copy Result");
-            DrawButton(Bottom4Button, "Paste Result");
+            DrawButton(Bottom4Button, "Unused");
+        }
+
+        public void DrawBButtons2()
+        {
+            Console.WriteLine("Drawing Bottom Buttons 2");
+            // Clear the the bottom buttons, then redraw them
+            SplashKit.FillRectangle(Color.White, Bottom1Button);
+            SplashKit.FillRectangle(Color.White, Bottom2Button);
+            SplashKit.FillRectangle(Color.White, Bottom3Button);
+            SplashKit.FillRectangle(Color.White, Bottom4Button);
+
+            DrawButton(Bottom1Button, "Copy RAW");
+            DrawButton(Bottom2Button, "Copy LaTeX");
+            DrawButton(Bottom3Button, "Copy ASCII");
+            DrawButton(Bottom4Button, "Exit");
         }
 
         public void DrawButton(Rectangle rect, string text)

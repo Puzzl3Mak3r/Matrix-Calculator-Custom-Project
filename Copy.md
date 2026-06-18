@@ -1,11 +1,7 @@
-# Copy/Paste Schema
+# Copy Schema
 
 ## Overview
 This module handles the Copying and Pasting of Matrices to and from the system clipboard.
-
-## Implementation Details
-- **Mechanism:** Implementation details to be investigated.
-- **Potential API:** May utilize `System.Windows.Forms.Clipboard` for system-level clipboard interactions.
 
 ## Supported Formats
 The implementation will include checks and parsers for the following text formats:

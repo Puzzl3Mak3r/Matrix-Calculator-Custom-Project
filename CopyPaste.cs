@@ -7,21 +7,34 @@ namespace Matrix_Calculator
     // Acts as the base class for format-specific clipboard operations.
     public class CopyPaste
     {
-        public virtual void CopyToClipboard(string text)
+        public string MatrixToText(MatrixData M)
+        {
+            string text = "{ ";
+            for (int i = 0; i < M.rows; i++)
+            {
+                for (int j = 0; j < M.cols; j++)
+                {
+                    text += M.matrix[i, j].ToString();
+                    if (j < M.cols - 1)
+                    {
+                        text += ",";
+                    }
+                }
+                if (i < M.rows - 1)
+                {
+                    text += "\n";
+                }
+            }
+            return text + " }";
+        }
+        public virtual void CopyToClipboard(string t)
         {
             // TODO: Implement direct OS clipboard integration
-            Console.WriteLine("Copy To Clipboard");
-            // 1. The string you want to copy
-            string demoTest = "test success!"; 
-
-            // (Later, this will be your LaTeX string)
-            // string demoTest = "\\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}";
-
+            Console.WriteLine($"Copying to clipboard: {t}");
             try
             {
                 // 2. The command that sends it to the OS clipboard
-                ClipboardService.SetText(demoTest);
-                
+                ClipboardService.SetText(t);
                 Console.WriteLine("Successfully copied to clipboard!");
             }
             catch (Exception ex)
@@ -30,16 +43,9 @@ namespace Matrix_Calculator
                 Console.WriteLine($"Clipboard error: {ex.Message}");
             }
         }
-
-        public virtual string PasteFromClipboard()
-        {
-            // TODO: Implement direct OS clipboard integration
-            Console.WriteLine("Paste From Clipboard");
-            throw new NotImplementedException("Clipboard paste not implemented yet");
-        }
     }
 
-    // Handles formatting matrix data into LaTeX syntax before copying, and parsing LaTeX syntax when pasting.
+    // Handles formatting matrix data into LaTeX syntax before copying
     public class CopyPasteLaTeX : CopyPaste
     {
         public override void CopyToClipboard(string text)
@@ -47,27 +53,15 @@ namespace Matrix_Calculator
             // TODO: Format string to LaTeX and copy to clipboard
             base.CopyToClipboard(text);
         }
-
-        public override string PasteFromClipboard()
-        {
-            // TODO: Paste from clipboard and parse LaTeX to standard string
-            return base.PasteFromClipboard();
-        }
     }
 
-    // Handles formatting matrix data into an ASCII grid before copying, and parsing ASCII grids when pasting.
+    // Handles formatting matrix data into an ASCII grid before copying
     public class CopyPasteASCII : CopyPaste
     {
         public override void CopyToClipboard(string text)
         {
             // TODO: Format string to ASCII grid and copy to clipboard
             base.CopyToClipboard(text);
-        }
-
-        public override string PasteFromClipboard()
-        {
-            // TODO: Paste from clipboard and parse ASCII grid to standard string
-            return base.PasteFromClipboard();
         }
     }
 }

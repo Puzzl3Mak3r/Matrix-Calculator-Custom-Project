@@ -30,6 +30,8 @@ namespace Matrix_Calculator
         private MOinvr _MOinvr = new MOinvr();
         private MOdetr _MOdetr = new MOdetr();
         private CopyPaste _CopyPaste = new CopyPaste();
+        private CopyPasteLaTeX _CopyPasteLaTeX = new CopyPasteLaTeX();
+        private CopyPasteASCII _CopyPasteASCII = new CopyPasteASCII();
 
         // ---------------------------------------------------------
         // Temporary Variables
@@ -67,6 +69,7 @@ namespace Matrix_Calculator
         int currentCellX = 0;
         int currentCellY = 0;
         string mathUsed = ""; // Tracking math to be use in copy paste
+        string cpUsed = ""; // Tracking what copy paste function to use
 
 
 
@@ -153,7 +156,7 @@ namespace Matrix_Calculator
 
                 if (SplashKit.MouseClicked(MouseButton.LeftButton))
                 {
-                    if (globalState != State.Idle)
+                    if (globalState != State.Idle && globalState != State.CopyPasting)
                     {
                         // Prompt to only do it when its in idle
                         Console.WriteLine("User attempted to use operation out of State.Idle");
@@ -161,7 +164,7 @@ namespace Matrix_Calculator
                         matricesShown = false;
                         _renderVisuals.UpdateMessageText($"{messageText}\nComplete the current matrix first");
                     }
-                    else 
+                    else
                     {
                         if (_matrices[0].matrix != null)
                         {
@@ -318,45 +321,39 @@ namespace Matrix_Calculator
                     }
                     
                     // ---------------------------------------------------------
-                    // 3. Bottom Buttons
+                    // 3. Bottom Buttons - Not exclusively State.Idle
 
                     // Handle Bottom 1
                     // Copy Equation // Copy/Paste Raw
                     if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom1Button))
                     {
-                        Console.WriteLine("Button Clicked: Bottom 1");
-                        _CopyPaste.CopyToClipboard("t");
-
                         // Copying Equation
                         if (globalState == State.Idle)
                         {
-                            
+                            cpUsed = "copyE";
+                            globalState = State.CopyPasting;
+                            _renderVisuals.DrawBButtons2();
                         }
                         // Copy/Paste Raw
                         else if (globalState == State.CopyPasting)
                         {
-                            
+                            HandleCopyPasteAction(_CopyPaste);
                         }
                     }
                     // Handle Bottom 2
-                    // Paste Equation // Copy/Paste LaTeX
+                    // Copy LaTeX
                     else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom2Button))
                     {
                         Console.WriteLine("Button Clicked: Bottom 2");
 
-                        // Pasting Equation
-                        if (globalState == State.Idle)
+                        // Copy LaTeX
+                        if (globalState == State.CopyPasting)
                         {
-                            
-                        }
-                        // Copy/Paste LaTeX
-                        else if (globalState == State.CopyPasting)
-                        {
-                            
+                            HandleCopyPasteAction(_CopyPasteLaTeX);
                         }
                     }
                     // Handle Bottom 3
-                    // Copy Result // Copy/Paste ASCII
+                    // Copy Result // Copy ASCII
                     else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom3Button))
                     {
                         Console.WriteLine("Button Clicked: Bottom 3");
@@ -364,29 +361,28 @@ namespace Matrix_Calculator
                         // Copying Result
                         if (globalState == State.Idle)
                         {
-                            
+                            cpUsed = "copyR";
+                            globalState = State.CopyPasting;
+                            _renderVisuals.DrawBButtons2();
                         }
-                        // Copy/Paste ASCII
+                        // Copy ASCII
                         else if (globalState == State.CopyPasting)
                         {
-                            
+                            HandleCopyPasteAction(_CopyPasteASCII);
                         }
                     }
                     // Handle Bottom 4
-                    // Paste Result // Cancel
+                    // Exit
                     else if (SplashKit.PointInRectangle(mousePos, _renderVisuals.Bottom4Button))
                     {
                         Console.WriteLine("Button Clicked: Bottom 4");
                         
-                        // Pasting Result
-                        if (globalState == State.Idle)
+                        // Exit
+                        if (globalState == State.CopyPasting)
                         {
-                            
-                        }
-                        // Cancel
-                        else if (globalState == State.CopyPasting)
-                        {
+                            cpUsed = "";
                             globalState = State.Idle;
+                            _renderVisuals.DrawBButtons1();
                         }
                     }
                 }
@@ -464,6 +460,8 @@ namespace Matrix_Calculator
                             _renderVisuals.UpdateMessageText("Click to add matrix");
                             globalState = State.Idle;
                             shoRidOfMsg = false; // Change for reuse
+                            mathUsed = "";
+                            Console.WriteLine("Matrices cleared");
                         }
                         else if (cache == "Escape")
                         {
@@ -474,6 +472,21 @@ namespace Matrix_Calculator
                         }
                     }
                 }
+
+
+
+                // ---------------------------------------------------------
+                // State: CopyPasting
+                // ---------------------------------------------------------
+
+                if (globalState == State.CopyPasting)
+                {
+                    if (previousState != State.CopyPasting)
+                    {
+                        Console.WriteLine(cpUsed);
+                    }
+                }
+
 
 
 
@@ -513,7 +526,8 @@ namespace Matrix_Calculator
                                 messageText = "Click to add matrix";
                                 _renderVisuals.UpdateMessageText(messageText);
                                 Console.WriteLine("Matrix input canceled");
-                            } else if (cache == "Enter")
+                            }
+                            else if (cache == "Enter")
                             {
                                 if (tempData.Length > 0 && int.TryParse(tempData, out int parsedValue))
                                 {
@@ -697,6 +711,40 @@ namespace Matrix_Calculator
             }
         }
 
+        private void HandleCopyPasteAction(CopyPaste cpHandler)
+        {
+            if (cpUsed == "copyR") // Handle copying just the result matrix
+            {
+                if (_matrices[2].matrix != null) // Ensure there is a result to copy
+                {
+                    string clipboardText = cpHandler.MatrixToText(_matrices[2]);
+                    Console.WriteLine(clipboardText);
+                    cpHandler.CopyToClipboard(clipboardText);
+                }
+            }
+            else if (cpUsed == "copyE") // Handle copying the full equation
+            {
+                if (_matrices[0].matrix != null && mathUsed != "")
+                {
+                    string clipboardText;
+                    // Format for unary operations like transpose, inverse, determinant
+                    if (mathUsed == "transpose" || mathUsed == "inverse" || mathUsed == "determinant")
+                    {
+                        clipboardText = $"{mathUsed} {cpHandler.MatrixToText(_matrices[0])} = {cpHandler.MatrixToText(_matrices[2])}";
+                    }
+                    else // Format for binary operations like addition, subtraction, multiplication
+                    {
+                        clipboardText = $"{cpHandler.MatrixToText(_matrices[0])} {mathUsed} {cpHandler.MatrixToText(_matrices[1])} = {cpHandler.MatrixToText(_matrices[2])}";
+                    }
+                    Console.WriteLine(clipboardText);
+                    cpHandler.CopyToClipboard(clipboardText);
+                }
+            }
+            // Return to Idle after action is completed
+            cpUsed = "";
+            globalState = State.Idle;
+            _renderVisuals.DrawBButtons1();
+        }
 
 
         // ---------------------------------------------------------
@@ -827,16 +875,8 @@ namespace Matrix_Calculator
 
         void PrintMatrix(MatrixData M)
         {
-            // Print each value
-            for (int i = 0; i < M.rows; i++)
-            {
-                for (int j = 0; j < M.cols; j++)
-                {
-                    // Console.WriteLine($"{i}, {j}, {M.matrix[i, j]}");
-                    Console.Write($"{M.matrix[i, j]}, ");
-                }
-                Console.WriteLine();
-            }
+            // Use MatrixToText
+            Console.WriteLine(_CopyPaste.MatrixToText(M));
         }
     }
 }
