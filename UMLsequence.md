@@ -10,8 +10,10 @@ sequenceDiagram
     participant GUI as Program (Main Loop)
     participant Strategy as MOtran / MOinvr
     participant Det as MOdetr
+    participant ClipMgr as ClipboardManager
     participant CopyStrat as CopyLaTeX
     participant OS as OS Clipboard
+    participant RV as RenderVisuals
 
     User->>GUI: Clicks Transpose / Inverse / Determinant Button
     GUI->>GUI: PointInRectangle checks true
@@ -45,17 +47,22 @@ sequenceDiagram
     User->>GUI: Clicks "Copy LaTeX" Button
     GUI->>GUI: PointInRectangle checks true
     
-    GUI->>CopyStrat: MatrixToText(MatA) & MatrixToText(ResultMat)
+    GUI->>ClipMgr: HandleCopyAction("copyE", mathUsed, _matrices, _CopyLaTeX)
+    activate ClipMgr
+    ClipMgr->>CopyStrat: MatrixToText(MatA) & MatrixToText(ResultMat)
     activate CopyStrat
     CopyStrat->>CopyStrat: Formats elements into \begin{bmatrix}... syntax
-    CopyStrat-->>GUI: Returns formatted LaTeX strings
+    CopyStrat-->>ClipMgr: Returns formatted LaTeX strings
     
-    GUI->>GUI: Formats full equation string
-    GUI->>CopyStrat: CopyToClipboard(equationString)
+    ClipMgr->>ClipMgr: Formats full equation string
+    ClipMgr->>CopyStrat: CopyToClipboard(equationString)
     CopyStrat->>OS: ClipboardService.SetText(equationString)
     deactivate CopyStrat
+    ClipMgr-->>GUI: (Returns void)
+    deactivate ClipMgr
     
-    GUI->>User: UpdateMessageText("Copied to clipboard")
+    GUI->>RV: ReRenderMatrices(_matrices)
+    GUI->>RV: UpdateMessageText("Copied to clipboard\nClick to continue")
 ```
 
 ## 2 Martix Operations (Addition, Subtraction, Multiplication), Copying RAW Result

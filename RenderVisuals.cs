@@ -195,5 +195,42 @@ namespace Matrix_Calculator
             
             Console.WriteLine("Board cleared");
         }
+
+        public void ReRenderMatrices(MatrixData[] matrices)
+        {
+            ClearBoard();
+            if (matrices[0].matrix != null && matrices[1].matrix != null)
+            {
+                // Display first matrix on left, second matrix on right
+                DisplayMatrix(matrices[0], 10, 150, 370, 360);
+                DisplayMatrix(matrices[1], 360, 150, 370, 360);
+            }
+            else if (matrices[0].matrix != null)
+            {
+                // Display first matrix in center
+                DisplayMatrix(matrices[0], 185, 150, 370, 360);
+            }
+        }
+
+        public void DisplayMatrix(MatrixData M, int x, int y, int w, int h)
+        {
+            Console.WriteLine($"Displaying matrix with dimensions: {M.rows} x {M.cols}");
+            DrawBrackets((double)x, (double)y, (double)w, (double)h);
+
+            for (int i = 0; i < M.rows; i++)
+            {
+                for (int j = 0; j < M.cols; j++)
+                {
+                    string val = M.matrix[i, j].ToString();
+                    Font font = SplashKit.GetSystemFont();
+                    const int fontSize = 18;
+                    double cellWidth = (w - 80) / (double)M.cols;
+                    double cellHeight = (h - 80) / (double)M.rows;
+                    double textX = x + 40 + (j * cellWidth) + (cellWidth / 2) - (SplashKit.TextWidth(val, font, fontSize) / 2);
+                    double textY = y + 40 + (i * cellHeight) + (cellHeight / 2) - (SplashKit.TextHeight(val, font, fontSize) / 2);
+                    SplashKit.DrawText(val, Color.Black, font, fontSize, textX, textY);
+                }
+            }
+        }
     }
 }

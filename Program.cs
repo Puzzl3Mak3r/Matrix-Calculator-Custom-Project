@@ -178,7 +178,8 @@ namespace Matrix_Calculator
                                     // Run Dimension Checker
                                     if (!(_matrices[0].rows == _matrices[1].rows && _matrices[0].cols == _matrices[1].cols))
                                     {
-                                        ReRenderMatrices();
+                                        _renderVisuals.ReRenderMatrices(_matrices);
+                                        matricesShown = true;
                                         Console.WriteLine("Error: Matrices must have the same dimensions for addition");
                                         _renderVisuals.UpdateMessageText($"{messageText}\nMatrices must have the same dimensions for addition");
                                     }
@@ -190,7 +191,7 @@ namespace Matrix_Calculator
                                         _renderVisuals.ClearBoard(); // Clear UI for result display
                                         matricesShown = false;
                                         globalState = State.ExecutingMath;
-                                        PrintMatrix(_matrices[2]);
+                                        Console.WriteLine(_Copy.MatrixToText(_matrices[2]));
                                         mathUsed = "add";
                                     }
                                 }
@@ -199,7 +200,8 @@ namespace Matrix_Calculator
                                     // Run Dimension Checker
                                     if (!(_matrices[0].rows == _matrices[1].rows && _matrices[0].cols == _matrices[1].cols))
                                     {
-                                        ReRenderMatrices();
+                                        _renderVisuals.ReRenderMatrices(_matrices);
+                                        matricesShown = true;
                                         Console.WriteLine("Error: Matrices must have the same dimensions for subtraction");
                                         _renderVisuals.UpdateMessageText($"{messageText}\nMatrices must have the same dimensions for subtraction");
                                     }
@@ -211,7 +213,7 @@ namespace Matrix_Calculator
                                         _renderVisuals.ClearBoard(); // Clear UI for result display
                                         matricesShown = false;
                                         globalState = State.ExecutingMath;
-                                        PrintMatrix(_matrices[2]);
+                                        Console.WriteLine(_Copy.MatrixToText(_matrices[2]));
                                         mathUsed = "subtract";
                                     }
                                 }
@@ -221,8 +223,8 @@ namespace Matrix_Calculator
                                     if (_matrices[0].cols != _matrices[1].rows)
                                     {
                                         _renderVisuals.ClearBoard();
-                                        DisplayMatrix(_matrices[0], 10, 150, 370, 360);
-                                        DisplayMatrix(_matrices[1], 360, 150, 370, 360);
+                                        _renderVisuals.DisplayMatrix(_matrices[0], 10, 150, 370, 360);
+                                        _renderVisuals.DisplayMatrix(_matrices[1], 360, 150, 370, 360);
                                         Console.WriteLine("Error: Matrices are not compatible for multiplication");
                                         _renderVisuals.UpdateMessageText($"{messageText}\nMatrices are not compatible for multiplication");
                                     }
@@ -234,7 +236,7 @@ namespace Matrix_Calculator
                                         _renderVisuals.ClearBoard(); // Clear UI for result display
                                         matricesShown = false;
                                         globalState = State.ExecutingMath;
-                                        PrintMatrix(_matrices[2]);
+                                        Console.WriteLine(_Copy.MatrixToText(_matrices[2]));
                                         mathUsed = "multiply";
                                     }
                                 }
@@ -247,7 +249,8 @@ namespace Matrix_Calculator
                             {
                                 if (_matrices[1].matrix != null)
                                 {
-                                    ReRenderMatrices();
+                                    _renderVisuals.ReRenderMatrices(_matrices);
+                                    matricesShown = true;
                                     Console.WriteLine("Error: There are multiple matrices");
                                     _renderVisuals.UpdateMessageText("There are multiple matrices\nPlease clear matrices, and enter 1 matrix");
                                 }
@@ -259,7 +262,7 @@ namespace Matrix_Calculator
                                     _renderVisuals.ClearBoard();
                                     matricesShown = false;
                                     globalState = State.ExecutingMath;
-                                    PrintMatrix(_matrices[2]);
+                                    Console.WriteLine(_Copy.MatrixToText(_matrices[2]));
                                     mathUsed = "transpose";
                                 }
                             }
@@ -267,25 +270,29 @@ namespace Matrix_Calculator
                             {
                                 if (_matrices[1].matrix != null) // Checks if a second matrix exists
                                 {
-                                    ReRenderMatrices();
+                                    _renderVisuals.ReRenderMatrices(_matrices);
+                                    matricesShown = true;
                                     Console.WriteLine("Error: There are multiple matrices");
                                     _renderVisuals.UpdateMessageText("There are multiple matrices\nPlease clear matrices, and enter 1 matrix");
                                 }
                                 else if (_matrices[0].rows != _matrices[0].cols) // Checks if the matrix is a square
                                 {
-                                    ReRenderMatrices();
+                                    _renderVisuals.ReRenderMatrices(_matrices);
+                                    matricesShown = true;
                                     Console.WriteLine("Error: Matrix must be square for determinant");
                                     _renderVisuals.UpdateMessageText($"{messageText}\nMatrix must be square for determinant");
                                 }
                                 else if (_matrices[0].rows != 2 && _matrices[0].rows != 3) // Checks if it is a 2x2 or 3x3 matrix
                                 {
-                                    ReRenderMatrices();
+                                    _renderVisuals.ReRenderMatrices(_matrices);
+                                    matricesShown = true;
                                     Console.WriteLine("Error: Not a 2x2 or 3x3 matrix");
                                     _renderVisuals.UpdateMessageText($"{messageText}\nInverse only supports 2x2 or 3x3 matrix");
                                 }
                                 else if (_MOdetr.CalculateDeterminant(_matrices[0]) == 0) // Checks if the matrix is singular
                                 {
-                                    ReRenderMatrices();
+                                    _renderVisuals.ReRenderMatrices(_matrices);
+                                    matricesShown = true;
                                     Console.WriteLine("Error: Matrix is singular (determinant is 0)");
                                     _renderVisuals.UpdateMessageText($"{messageText}\nMatrix is singular (cannot be inverted)");
                                 }
@@ -297,7 +304,7 @@ namespace Matrix_Calculator
                                     _renderVisuals.ClearBoard();
                                     matricesShown = false;
                                     globalState = State.ExecutingMath;
-                                    PrintMatrix(_matrices[2]);
+                                    Console.WriteLine(_Copy.MatrixToText(_matrices[2]));
                                     mathUsed = "inverse";
                                 }
                             }
@@ -307,19 +314,22 @@ namespace Matrix_Calculator
                                 
                                 if (_matrices[1].matrix != null)
                                 {
-                                    ReRenderMatrices();
+                                    _renderVisuals.ReRenderMatrices(_matrices);
+                                    matricesShown = true;
                                     Console.WriteLine("Error: There are multiple matrices");
                                     _renderVisuals.UpdateMessageText("There are multiple matrices\nPlease clear matrices, and enter 1 matrix");
                                 }
                                 else if (_matrices[0].rows != _matrices[0].cols)
                                 {
-                                    ReRenderMatrices();
+                                    _renderVisuals.ReRenderMatrices(_matrices);
+                                    matricesShown = true;
                                     Console.WriteLine("Error: Matrix must be square for determinant");
                                     _renderVisuals.UpdateMessageText($"{messageText}\nMatrix must be square for determinant");
                                 }
                                 else if (_matrices[0].rows != 2 && _matrices[0].rows != 3)
                                 {
-                                    ReRenderMatrices();
+                                    _renderVisuals.ReRenderMatrices(_matrices);
+                                    matricesShown = true;
                                     Console.WriteLine("Error: Not a 2x2 or 3x3 matrix");
                                     _renderVisuals.UpdateMessageText($"{messageText}\nDeterminant only supports 2x2 or 3x3 matrix");
                                 }
@@ -339,7 +349,7 @@ namespace Matrix_Calculator
                                     _renderVisuals.ClearBoard();
                                     matricesShown = false;
                                     globalState = State.ExecutingMath;
-                                    PrintMatrix(_matrices[2]);
+                                    Console.WriteLine(_Copy.MatrixToText(_matrices[2]));
                                     mathUsed = "determinant";
                                 }
                             }
@@ -363,7 +373,7 @@ namespace Matrix_Calculator
                         // Copy/Paste Raw
                         else if (globalState == State.CopyPasting)
                         {
-                            HandleCopyAction(_Copy);
+                            FinishCopyAction(_Copy);
                         }
                     }
                     // Handle Bottom 2
@@ -375,7 +385,7 @@ namespace Matrix_Calculator
                         // Copy LaTeX
                         if (globalState == State.CopyPasting)
                         {
-                            HandleCopyAction(_CopyLaTeX);
+                            FinishCopyAction(_CopyLaTeX);
                         }
                     }
                     // Handle Bottom 3
@@ -394,7 +404,7 @@ namespace Matrix_Calculator
                         // Copy ASCII
                         else if (globalState == State.CopyPasting)
                         {
-                            HandleCopyAction(_CopyASCII);
+                            FinishCopyAction(_CopyASCII);
                         }
                     }
                     // Handle Bottom 4
@@ -424,7 +434,8 @@ namespace Matrix_Calculator
                     // Draw Matrix(s) if existing
                     if (!matricesShown)
                     {
-                        ReRenderMatrices();
+                        _renderVisuals.ReRenderMatrices(_matrices);
+                        matricesShown = true;
                         messageText = "Click to add matrix";
                         _renderVisuals.UpdateMessageText(messageText);
                     }
@@ -474,7 +485,7 @@ namespace Matrix_Calculator
                     
                     if (!string.IsNullOrEmpty(currentKey))
                     {
-                        string cache = GetValidKey(currentKey);
+                        string cache = UserInput.GetValidKey(currentKey);
                         if (cache == "Enter")
                         {
                             // Delete the matrices
@@ -526,7 +537,7 @@ namespace Matrix_Calculator
                     if (!string.IsNullOrEmpty(currentKey))
                     {
                         // Format the raw KeyCode string
-                        string cache = GetValidKey(currentKey); 
+                        string cache = UserInput.GetValidKey(currentKey); 
                         
                         // Verify it is a valid key (0-9, minus, period, or Backspace)
                         bool isValid = (cache == "Enter" ||
@@ -611,7 +622,7 @@ namespace Matrix_Calculator
                     if (!string.IsNullOrEmpty(currentKey))
                     {
                         // Format the raw KeyCode string
-                        string cache = GetValidKey(currentKey);
+                        string cache = UserInput.GetValidKey(currentKey);
                         
                         // Verify it is a valid key (0-9, minus, period, or Backspace)
                         bool isValid = (cache == "Enter" ||
@@ -663,7 +674,16 @@ namespace Matrix_Calculator
                                             {
                                                 // Store the data
                                                 Console.WriteLine("Matrix input complete");
-                                                StoreMatrix(tempMatrix);
+                                                if (_matrices[0].matrix == null)
+                                                {
+                                                    _matrices[0] = tempMatrix;
+                                                }
+                                                else
+                                                {
+                                                    _matrices[1] = tempMatrix;
+                                                }
+                                                Console.WriteLine("Matrix contents:");
+                                                Console.WriteLine(_Copy.MatrixToText(tempMatrix));
 
                                                 // Go back to Idle and reset
                                                 Reset();
@@ -713,8 +733,8 @@ namespace Matrix_Calculator
                 {
                     Console.WriteLine("Executing Math");
                     _renderVisuals.ClearBoard();
-                    DisplayMatrix(_matrices[2], 185, 150, 370, 360);
-                    PrintMatrix(_matrices[2]);
+                    _renderVisuals.DisplayMatrix(_matrices[2], 185, 150, 370, 360);
+                    Console.WriteLine(_Copy.MatrixToText(_matrices[2]));
                     matricesShown = true;
                     Console.WriteLine($"messageText: {messageText}");
 
@@ -737,38 +757,12 @@ namespace Matrix_Calculator
             }
         }
 
-        private void HandleCopyAction(Copy copyHandler)
+        private void FinishCopyAction(Copy copyHandler)
         {
-            if (copyMethodUsed == "copyR") // Handle copying just the result matrix
-            {
-                if (_matrices[2].matrix != null) // Ensure there is a result to copy
-                {
-                    string clipboardText = copyHandler.MatrixToText(_matrices[2]);
-                    Console.WriteLine(clipboardText);
-                    copyHandler.CopyToClipboard(clipboardText);
-                }
-            }
-            else if (copyMethodUsed == "copyE") // Handle copying the full equation
-            {
-                if (_matrices[0].matrix != null && mathUsed != "")
-                {
-                    string clipboardText;
-                    // Format for unary operations like transpose, inverse, determinant
-                    if (mathUsed == "transpose" || mathUsed == "inverse" || mathUsed == "determinant")
-                    {
-                        clipboardText = $"{mathUsed}\n{copyHandler.MatrixToText(_matrices[0])}\n=\n{copyHandler.MatrixToText(_matrices[2])}";
-                    }
-                    else // Format for binary operations like addition, subtraction, multiplication
-                    {
-                        clipboardText = $"{copyHandler.MatrixToText(_matrices[0])}\n{mathUsed}\n{copyHandler.MatrixToText(_matrices[1])}\n=\n{copyHandler.MatrixToText(_matrices[2])}";
-                    }
-                    Console.WriteLine(clipboardText);
-                    copyHandler.CopyToClipboard(clipboardText);
-                }
-            }
-            // Message user it has been copied
-            Console.WriteLine("Copied to clipboard");
-            ReRenderMatrices();
+            ClipboardManager.HandleCopyAction(copyMethodUsed, mathUsed, _matrices, copyHandler);
+            
+            _renderVisuals.ReRenderMatrices(_matrices);
+            matricesShown = true;
             _renderVisuals.UpdateMessageText($"Copied to clipboard\nClick to continue");
 
             // Return to Idle after action is completed
@@ -795,119 +789,5 @@ namespace Matrix_Calculator
             Console.WriteLine("Variables reset");
         }
 
-
-
-        // ---------------------------------------------------------
-        // Input & Validation
-        // ---------------------------------------------------------
-
-        private string GetValidKey(string input)
-        {
-            if (string.IsNullOrEmpty(input)) return "";
-
-            // Trim "Key" at the end if it exists (e.g. "Num1Key" -> "Num1", "BackspaceKey" -> "Backspace")
-            if (input.EndsWith("Key"))
-            {
-                input = input.Substring(0, input.Length - 3);
-            }
-
-            // If it starts with "Num" (e.g. "Num1"), trim "Num" so we just get the number ("1")
-            if (input.StartsWith("Num"))
-            {
-                input = input.Substring(3);
-            }
-            else if (input.StartsWith("Keypad"))
-            {
-                input = input.Substring(6); // Trim "Keypad" (e.g. "Keypad1" -> "1")
-            }
-
-            // Map special character formats
-            if (input == "Minus") return "-";
-            if (input == "Period") return ".";
-            if (input == "Return") return "Enter";
-
-            return input;
-        }
-
-
-
-        // ---------------------------------------------------------
-        // Matrix Display & Rendering
-        // ---------------------------------------------------------
-
-        // Rerender matrices with clearscreen
-        void ReRenderMatrices()
-        {
-            _renderVisuals.ClearBoard();
-            matricesShown = true;
-            if (_matrices[0].matrix != null && _matrices[1].matrix != null)
-            {
-                // Display first matrix on left, second matrix on right
-                DisplayMatrix(_matrices[0], 10, 150, 370, 360);
-                DisplayMatrix(_matrices[1], 360, 150, 370, 360);
-            } else if (_matrices[0].matrix != null)
-            {
-                // Display first matrix in center
-                DisplayMatrix(_matrices[0], 185, 150, 370, 360);
-            }
-        }
-
-        // Display matrix on matrixEntryBox
-        void DisplayMatrix(MatrixData M, int x, int y, int w, int h)
-        {
-            Console.WriteLine($"Displaying matrix with dimensions: {M.rows} x {M.cols}");
-
-            // Add Brackets
-            _renderVisuals.DrawBrackets((double)x, (double)y, (double)w, (double)h);
-
-
-            // Iterate through the values
-            for (int i = 0; i < M.rows; i++)
-            {
-                for (int j = 0; j < M.cols; j++)
-                {
-                    string val = M.matrix[i, j].ToString();
-                    Font font = SplashKit.GetSystemFont();
-                    const int fontSize = 18;
-
-                    // Calculate grid positions based on provided dimensions and top-left corner
-                    double cellWidth = (w - 80) / (double)M.cols;
-                    double cellHeight = (h - 80) / (double)M.rows;
-                    double textX = x + 40 + (j * cellWidth) + (cellWidth / 2) - (SplashKit.TextWidth(val, font, fontSize) / 2);
-                    double textY = y + 40 + (i * cellHeight) + (cellHeight / 2) - (SplashKit.TextHeight(val, font, fontSize) / 2);
-
-                    SplashKit.DrawText(val, Color.Black, font, fontSize, textX, textY);
-                }
-            }
-        }
-
-
-
-        // ---------------------------------------------------------
-        // Matrix Data Operations & Debugging
-        // ---------------------------------------------------------
-
-        void StoreMatrix(MatrixData M)
-        {
-            // Store the matrix
-            if (_matrices[0].matrix == null)
-            {
-                _matrices[0] = M;
-            }
-            else
-            {
-                _matrices[1] = M;
-            }
-
-            // Print the matrix
-            Console.WriteLine("Matrix contents:");
-            PrintMatrix(M);
-        }
-
-        void PrintMatrix(MatrixData M)
-        {
-            // Use MatrixToText
-            Console.WriteLine(_Copy.MatrixToText(M));
-        }
     }
 }

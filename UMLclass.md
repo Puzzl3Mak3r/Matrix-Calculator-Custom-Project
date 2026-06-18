@@ -19,15 +19,58 @@ classDiagram
         -Copy _Copy
         -CopyLaTeX _CopyLaTeX
         -CopyASCII _CopyASCII
+        -int tempRows
+        -int tempCols
+        -string messageText
+        -string tempData
+        -MatrixData tempMatrix
+        -string currentKey
+        -bool matricesShown
+        -bool shoRidOfMsg
+        -State globalState
+        -State previousState
         -MatrixData[] _matrices
-        +Main()
+        -int currentCellX
+        -int currentCellY
+        -string mathUsed
+        -string copyMethodUsed
+        +Main()$
         +Run()
+        -FinishCopyAction(Copy copyHandler)
+        -Reset()
     }
 
     class RenderVisuals {
+        +Rectangle AddButton
+        +Rectangle SubtractButton
+        +Rectangle MultiplyButton
+        +Rectangle TransposeButton
+        +Rectangle InverseButton
+        +Rectangle DeterminantButton
+        +Rectangle Bottom1Button
+        +Rectangle Bottom2Button
+        +Rectangle Bottom3Button
+        +Rectangle Bottom4Button
+        +Rectangle MatrixEntryBox
         +DrawUI()
+        +DrawBButtons1()
+        +DrawBButtons2()
+        +DrawButton(Rectangle rect, string text)
+        +UpdateMatrixDisplay(bool isEnteringData, string messageText, string tempData)
+        +UpdateMessageText(string t)
+        +DrawBrackets(double x, double y, double w, double h)
         +DrawMatrix(int Rows, int Cols)
-        +UpdateMatrixDisplay(...)
+        +ClearBoard()
+        +ReRenderMatrices(MatrixData[] matrices)
+        +DisplayMatrix(MatrixData M, int x, int y, int w, int h)
+    }
+
+    class UserInput {
+        +GetValidKey(string input)$ string
+    }
+
+    class ClipboardManager {
+        +HandleCopyAction(string copyMethodUsed, string mathUsed, MatrixData[] matrices, Copy copyHandler)$ void
     }
 
     %% Data Structures & Domain
@@ -40,7 +83,7 @@ classDiagram
     }
 
     class MatrixFactory {
-        +CreateZMatrix(int rows, int cols) MatrixData
+        +CreateZMatrix(int rows, int cols)$ MatrixData
     }
 
     %% Copy + Paste
@@ -65,40 +108,46 @@ classDiagram
     }
 
     class MOadd {
-        +ExecuteTwo(MatrixData a, MatrixData b) MatrixData
+        +ExecuteTwo(MatrixData matrixA, MatrixData matrixB) MatrixData
     }
 
     class MOsubt {
-        +ExecuteTwo(MatrixData a, MatrixData b) MatrixData
+        +ExecuteTwo(MatrixData matrixA, MatrixData matrixB) MatrixData
     }
 
     class MOmult {
-        +ExecuteTwo(MatrixData a, MatrixData b) MatrixData
+        +ExecuteTwo(MatrixData matrixA, MatrixData matrixB) MatrixData
     }
 
     class MOtran {
-        +ExecuteOne(MatrixData a) MatrixData
+        +ExecuteOne(MatrixData matrixA) MatrixData
     }
 
     class MOinvr {
-        +ExecuteOne(MatrixData a) MatrixData
+        -MOdetr _detr
+        +ExecuteOne(MatrixData matrixA) MatrixData
     }
 
-    class OperationDeterminant {
-        +CalculateDeterminant(MatrixData a) double
+    class MOdetr {
+        +CalculateDeterminant(MatrixData matrixA) double
     }
 
     %% Relationships
     Program --> RenderVisuals : Uses
     Program --> MatrixFactory : Uses
     Program --> Copy : Uses
+    Program --> UserInput : Uses
+    Program --> ClipboardManager : Uses
+    ClipboardManager --> Copy : Uses
     Program --> MO : Uses Strategy
     Program --> MOdetr : Uses
+    MatrixFactory --> MatrixData : Uses
     MO <|-- MOadd
     MO <|-- MOsubt
     MO <|-- MOmult
     MO <|-- MOtran
     MO <|-- MOinvr
+    MO --> MatrixFactory : Uses
     MOinvr --> MOdetr : Uses
     Copy <|-- CopyLaTeX
     Copy <|-- CopyASCII
