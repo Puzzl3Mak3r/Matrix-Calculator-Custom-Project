@@ -8,24 +8,26 @@ To view this diagram, view this file in a markdown editor that supports Mermaid.
 classDiagram
     %% Core GUI and Application
     class Program {
-        -Matrix _matrixA
-        -Matrix _matrixB
-        -Matrix _matrixResult
-        -Operation _activeStrategy
-        -MatrixMemento _internalClipboard
+        -Window _window
+        -RenderVisuals _renderVisuals
+        -MOadd _MOadd
+        -MOsubt _MOsubt
+        -MOmult _MOmult
+        -MOtran _MOtran
+        -MOinvr _MOinvr
+        -MOdetr _MOdetr
+        -Copy _Copy
+        -CopyLaTeX _CopyLaTeX
+        -CopyASCII _CopyASCII
+        -MatrixData[] _matrices
         +Main()
         +Run()
     }
 
-    class UserInput {
-        -string _currentBuffer
-        -List~double~ _parsedValues
-        -int _targetRows
-        -int _targetCols
-        +ProcessKey(KeyCode key)
-        +Backspace()
-        +Confirm()
-        +IsComplete() bool
+    class RenderVisuals {
+        +DrawUI()
+        +DrawMatrix(int Rows, int Cols)
+        +UpdateMatrixDisplay(...)
     }
 
     %% Data Structures & Domain
@@ -37,94 +39,67 @@ classDiagram
         +double[,] matrix
     }
 
-    class Matrix {
-        -MatrixData[] matrices
-        -int _rows
-        -int _cols
-        +int Rows
-        +int Cols
-        +GetValue(int r, int c) double
-        +SetValue(int r, int c, double val)
-        +CreateMemento() MatrixMemento
-        +RestoreFromMemento(MatrixMemento memento)
-        +ToLatexString() string
-    }
-
-    class MatrixMemento {
-        -MatrixData[] _stateSnapshot
-        -DateTime _timestamp
-        +MatrixData[] StateSnapshot
-        +MatrixMemento(MatrixData[] gridData)
-    }
-
     class MatrixFactory {
-        +CreateZeroMatrix(int rows, int cols) Matrix
-        +CreateIdentityMatrix(int size) Matrix
+        +CreateZMatrix(int rows, int cols) MatrixData
     }
 
     %% Copy + Paste
     class Copy {
-        +CopyToClipboard(string text)
-        +PasteFromClipboard() string
+        +MatrixToText(MatrixData M) string
+        +CopyToClipboard(string t)
     }
 
     class CopyLaTeX {
-        +CopyToClipboard(string text)
-        +PasteFromClipboard() string
+        +MatrixToText(MatrixData M) string
     }
 
     class CopyASCII {
-        +CopyToClipboard(string text)
-        +PasteFromClipboard() string
+        +MatrixToText(MatrixData M) string
     }
 
     %% Strategy Pattern for Operations
-    class Operation {
-        <<abstract / interface>>
-        +Execute(Matrix a, Matrix b) Matrix
-        +CheckDimensions(Matrix a, Matrix b) bool
+    class MO {
+        <<abstract>>
+        +ExecuteTwo(MatrixData matrixA, MatrixData matrixB) MatrixData
+        +ExecuteOne(MatrixData matrixA) MatrixData
     }
 
-    class OperationAddition {
-        +Execute(Matrix a, Matrix b) Matrix
+    class MOadd {
+        +ExecuteTwo(MatrixData a, MatrixData b) MatrixData
     }
 
-    class OperationSubtraction {
-        +Execute(Matrix a, Matrix b) Matrix
+    class MOsubt {
+        +ExecuteTwo(MatrixData a, MatrixData b) MatrixData
     }
 
-    class OperationMultiplication {
-        +Execute(Matrix a, Matrix b) Matrix
+    class MOmult {
+        +ExecuteTwo(MatrixData a, MatrixData b) MatrixData
     }
 
-    class OperationTranspose {
-        +Execute(Matrix a, Matrix b) Matrix
+    class MOtran {
+        +ExecuteOne(MatrixData a) MatrixData
     }
 
-    class OperationInvert {
-        +Execute(Matrix a, Matrix b) Matrix
+    class MOinvr {
+        +ExecuteOne(MatrixData a) MatrixData
     }
 
     class OperationDeterminant {
-        -double _determinant
-        +CalculateDeterminant(Matrix a) double
+        +CalculateDeterminant(MatrixData a) double
     }
 
     %% Relationships
-    Program --> Matrix : Manages
-    Program --> UserInput : Uses
-    Program --> Operation : Uses Strategy
+    Program --> RenderVisuals : Uses
     Program --> MatrixFactory : Uses
     Program --> Copy : Uses
-    Matrix --> MatrixMemento : Creates / Restores
-    MatrixFactory --> Matrix : Creates
-    Matrix --> MatrixData : Uses
-    Operation <|-- OperationAddition
-    Operation <|-- OperationSubtraction
-    Operation <|-- OperationMultiplication
-    Operation <|-- OperationTranspose
-    Operation <|-- OperationInvert
-    Operation <|-- OperationDeterminant
+    Program --> MO : Uses Strategy
+    Program --> MOdetr : Uses
+    MO <|-- MOadd
+    MO <|-- MOsubt
+    MO <|-- MOmult
+    MO <|-- MOtran
+    MO <|-- MOinvr
+    MOinvr --> MOdetr : Uses
     Copy <|-- CopyLaTeX
     Copy <|-- CopyASCII
 ```

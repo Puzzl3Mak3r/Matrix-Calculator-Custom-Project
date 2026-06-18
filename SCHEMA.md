@@ -1,4 +1,4 @@
-# Agent Specification File: Object-Oriented Matrix Calculator (C#/.NET)
+# Object-Oriented Matrix Calculator (C#/.NET)
 
 ## 1. Executive Project Overview
 This document serves as the complete, unambiguous technical specification for an autonomous developer agent to build a custom Matrix Calculator in C# using the .NET framework and the SplashKit graphics library. 
@@ -14,7 +14,7 @@ This document serves as the complete, unambiguous technical specification for an
 ## 2. Functional Requirements ("How It Should Work")
 
 ### Mathematical Engine
-* **Matrix Creation:** The system must allow users to define dynamic dimensions (Rows $\times$ Columns) for two distinct input matrices: Matrix A and Matrix B.
+* **Matrix Creation:** The system must allow users to define dynamic dimensions (Rows x Columns) for two distinct input matrices: Matrix A and Matrix B.
 * **Basic Operations:** The calculator must execute Matrix Addition, Matrix Subtraction, and Matrix Multiplication.
 * **Unary Operations:** The system must calculate the Transpose of a matrix.
 * **Validation Guardrails:** The program must validate mathematical compatibility before attempting operations. For addition and subtraction, dimensions must be identical. For multiplication, Matrix A columns must equal Matrix B rows. If validations fail, the user must receive a clean, non-crashing visual error message.
@@ -88,15 +88,16 @@ v requires execution
 
 ### Target Class List (Minimum 10 Classes)
 To meet the 10-30 class requirement, the project will implement the following structures (at least 13 classes):
+(MO means Matrix Operation)
 1. `Program`
-2. `Operation`
+2. `MO`
 3. `Matrix`
-4. `OperationAddition`
-5. `OperationSubtraction`
-6. `OperationMultiplication`
-7. `OperationTranspose`
-8. `OperationInvert` (Inverts the matrix, so that Matrix * Invert = Identity Matrix)
-9. `OperationDeterminant` (Calculates the determinant of a matrix)
+4. `MOAddition`
+5. `MOSubtraction`
+6. `MOMultiplication`
+7. `MOTranspose`
+8. `MOInvert` (Inverts the matrix, so that Matrix * Invert = Identity Matrix)
+9. `MODeterminant` (Calculates the determinant of a matrix)
 10. `Copy` (Direct)
 11. `CopyLaTeX` (Polymorphed to LaTeX)
 12. `CopyASCII` (Polymorphed to Formatted ASCII)
@@ -240,21 +241,3 @@ The agent must approach construction sequentially, testing boundaries at each st
 2. Create mouse bounding-box collision detection areas over cell coordinates.
 3. Setup key interception hooks to route character inputs into the currently active target cell string buffer.
 4. Bind operation selection inputs directly to the Strategy reference assignment handlers.
-
----
-
-## 6. Code Style, Quality, and Commenting Guidelines
-
-The generated codebase must strictly reflect industry-grade engineering and academic excellence. The autonomous agent must adhere to the following coding specifications:
-
-### Commenting Matrix & Documentation Blueprint
-Every class, public interface, and mathematical operation block must feature structured summary documentation.
-
-```csharp
-/// Executes a matrix multiplication strategy following linear algebra principles.
-/// Requires the column dimensions of Matrix A to match the row dimensions of Matrix B.
-/// <param name="a">The left-hand multiplicand matrix.</param>
-/// <param name="b">The right-hand multiplier matrix.</param>
-/// <returns>A new Matrix object containing the computed dot product results.</returns>
-/// <exception cref="InvalidOperationException">Thrown if matrix dimension constraints are violated.</exception>
-```
