@@ -1,4 +1,4 @@
-# Matrix-Calculator - Custom-Project
+# Matrix-Calculator
 
 Welcome to the custom Matrix Calculator project! Below you will find the architectural design diagrams that define the structure and behavior of the system.
 
